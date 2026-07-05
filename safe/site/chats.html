@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Чаты — Myavka.safe</title>
+  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") === "light" ? "light" : "dark";</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Archivo:wdth,wght@100..125,500..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">M</span>Myavka<span class="safe">.safe</span></a>
+      <nav class="nav">
+        <a href="index.html" data-i18n="nav.home">Главная</a>
+        <a href="catalog.html" data-i18n="nav.catalog">Каталог</a>
+        <a href="chats.html" class="active" data-i18n="nav.chats">Чаты</a>
+        <a href="blacklist.html" data-i18n="nav.blacklist">Чёрный список</a>
+        <a href="faq.html" data-i18n="nav.faq">FAQ</a>
+      </nav>
+      <div class="header-controls">
+        <select class="lang-select" id="lang-select">
+          <option value="ru">RU</option>
+          <option value="kz">KZ</option>
+          <option value="en">EN</option>
+        </select>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Тема">☀</button>
+        <a href="#" class="btn btn-tg" data-i18n="nav.login">Войти через Telegram</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container page-head">
+    <h1 data-i18n="chats.title">Чаты</h1>
+    <p data-i18n="chats.sub">Переписка с покупателями и продавцами</p>
+  </div>
+
+  <div class="container chat-layout">
+    <aside class="dlg-list" id="dlg-list"></aside>
+
+    <div class="chat">
+      <div class="chat-head" id="chat-head"></div>
+      <div class="paid-banner" id="paid-banner" hidden></div>
+      <div class="chat-body" id="chat-body"></div>
+      <div class="chat-input">
+        <input type="file" id="chat-file" accept="image/*,video/*,audio/*,.pdf,.zip" hidden />
+        <button class="attach-btn" id="chat-attach" aria-label="Прикрепить" title="Фото / видео / файл">📎</button>
+        <input type="text" id="chat-text" data-i18n-ph="chats.inputPh" placeholder="Написать сообщение…" />
+        <button class="btn btn-primary" id="chat-send" data-i18n="chats.send">Отправить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="pay-toast" hidden>
+    <div class="toast-icon">💸</div>
+    <div class="toast-text">
+      <strong data-i18n="chats.notifTitle">Клиент оплатил заказ</strong>
+      <span id="toast-desc"></span>
+    </div>
+    <button class="btn btn-green btn-sm" id="toast-go" data-i18n="chats.goChat">Перейти в чат</button>
+    <button class="toast-close" id="toast-close" aria-label="Закрыть">✕</button>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="copy" data-i18n="footer.copy">© 2026 Myavka.safe — все права защищены</div>
+    </div>
+  </footer>
+  <script src="js/app.js"></script>
+  <script src="js/chat.js"></script>
+</body>
+</html>

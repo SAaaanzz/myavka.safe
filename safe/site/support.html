@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Myavka.safe — Панель поддержки</title>
+  <meta name="robots" content="noindex" />
+  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") === "light" ? "light" : "dark";</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Archivo:wdth,wght@100..125,500..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">M</span>Myavka<span class="safe">.safe</span> <span style="color:var(--muted);font-size:.8rem;font-weight:600;margin-left:6px">поддержка</span></a>
+      <div class="header-controls" style="margin-left:auto">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Тема">☀</button>
+        <button class="btn btn-outline btn-sm" id="sup-logout" hidden>Выйти</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="support-wrap">
+    <!-- Вход -->
+    <form class="support-login" id="sup-login-form">
+      <h2>Вход для сотрудников</h2>
+      <p style="color:var(--muted);font-size:.85rem">Доступ только по логину и паролю. Аккаунты выдаёт владелец сервиса.</p>
+      <input type="text" id="sup-login" placeholder="Логин" autocomplete="username" required />
+      <input type="password" id="sup-pass" placeholder="Пароль" autocomplete="current-password" required />
+      <div class="modal-error" id="sup-login-err" hidden>Неверный логин или пароль</div>
+      <button class="btn btn-primary" type="submit">Войти</button>
+    </form>
+
+    <!-- Панель -->
+    <div id="sup-panel" hidden>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <h2 style="font-size:1.25rem">Тикеты поддержки</h2>
+        <span id="sup-whoami" style="color:var(--muted);font-size:.85rem"></span>
+        <button class="btn btn-outline btn-sm" id="sup-settings-btn" style="margin-left:auto">Настройки</button>
+      </div>
+      <div class="dept-tabs" id="dept-tabs"></div>
+      <div id="ticket-list"></div>
+      <div class="ticket-view" id="ticket-view" hidden></div>
+
+      <!-- Настройки: смена пароля, сотрудники (для владельца) -->
+      <div class="ticket-view" id="sup-settings" hidden>
+        <h3 style="margin-bottom:10px">Смена пароля</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input class="sup-input" type="password" id="pw-old" placeholder="Текущий пароль" autocomplete="current-password" />
+          <input class="sup-input" type="password" id="pw-new" placeholder="Новый пароль (мин. 8 символов)" autocomplete="new-password" />
+          <button class="btn btn-primary btn-sm" id="pw-save">Сменить</button>
+        </div>
+        <div id="owner-tools" hidden>
+          <h3 style="margin:20px 0 10px">Сотрудники</h3>
+          <div id="staff-list" style="margin-bottom:12px"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input class="sup-input" type="text" id="st-login" placeholder="Логин сотрудника" />
+            <input class="sup-input" type="password" id="st-pass" placeholder="Пароль (мин. 8 символов)" />
+            <select class="sup-select" id="st-dept">
+              <option value="verification">Верификация</option>
+              <option value="sales">Продажи</option>
+              <option value="ban">Баны</option>
+              <option value="other">Прочее</option>
+              <option value="all">Все отделы</option>
+            </select>
+            <button class="btn btn-primary btn-sm" id="st-create">Создать</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/support.js"></script>
+</body>
+</html>

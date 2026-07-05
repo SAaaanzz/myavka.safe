@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQ — Myavka.safe</title>
+  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") === "light" ? "light" : "dark";</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Archivo:wdth,wght@100..125,500..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">M</span>Myavka<span class="safe">.safe</span></a>
+      <nav class="nav">
+        <a href="index.html" data-i18n="nav.home">Главная</a>
+        <a href="catalog.html" data-i18n="nav.catalog">Каталог</a>
+        <a href="chats.html" data-i18n="nav.chats">Чаты</a>
+        <a href="blacklist.html" data-i18n="nav.blacklist">Чёрный список</a>
+        <a href="faq.html" class="active" data-i18n="nav.faq">FAQ</a>
+      </nav>
+      <div class="header-controls">
+        <select class="lang-select" id="lang-select">
+          <option value="ru">RU</option>
+          <option value="kz">KZ</option>
+          <option value="en">EN</option>
+        </select>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Тема">☀</button>
+        <a href="#" class="btn btn-tg" data-i18n="nav.login">Войти через Telegram</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container page-head" style="text-align:center">
+    <h1 data-i18n="faq.title">Частые вопросы</h1>
+    <p data-i18n="faq.sub">Всё о том, как работает гарант Myavka.safe</p>
+  </div>
+
+  <section class="section">
+    <div class="container faq-list">
+      <details class="faq" open>
+        <summary>Как работает эскроу-защита?</summary>
+        <p>Покупатель оплачивает сделку через Kaspi — деньги замораживаются на счёте гаранта. Продавец получает средства только после того, как покупатель подтвердит получение товара или услуги. Если что-то пошло не так — открывается спор, который решает администратор.</p>
+      </details>
+      <details class="faq">
+        <summary>Почему вход только через Telegram?</summary>
+        <p>Telegram даёт единую точку входа без паролей, встроенную двухфакторную защиту и видимый номер телефона — это повышает доверие между сторонами сделки. Уведомления о сделках также приходят в Telegram-бот.</p>
+      </details>
+      <details class="faq">
+        <summary>Какая комиссия сервиса?</summary>
+        <p>Стандартная комиссия — 7% от суммы сделки (минимум 500 ₸). Сделка с участием администратора — 8% + 500 ₸ за вход админа. Верифицированные и VIP-продавцы получают пониженную комиссию.</p>
+      </details>
+      <details class="faq">
+        <summary>Зачем нужна верификация для продажи аккаунтов?</summary>
+        <p>Аккаунт можно восстановить через поддержку игры после продажи — это самый частый вид мошенничества. Поэтому продавцы аккаунтов обязаны подтвердить личность (документ + селфи). Для услуг (донат, буст, Stars) верификация не требуется.</p>
+      </details>
+      <details class="faq">
+        <summary>Как вызвать администратора в сделку?</summary>
+        <p>В чате любой сделки есть кнопка «Вызвать администратора» (500 ₸). Администратор входит в чат, контролирует сделку, может изменить данные и разрешить спор. Среднее время ответа — менее 5 минут, администраторы работают 24/7.</p>
+      </details>
+      <details class="faq">
+        <summary>Как вывести деньги?</summary>
+        <p>Средства выводятся на ваш Kaspi. Запрос на вывод можно сделать на сайте в профиле или через команду /withdraw в Telegram-боте.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="support">
+    <div class="container" style="max-width:640px">
+      <h2 data-i18n="sup.title">Написать в поддержку</h2>
+      <p class="sub" data-i18n="sup.sub">Выберите отдел — тикет попадёт нужному сотруднику. Ответ придёт в Telegram.</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <select class="sup-select" id="tk-dept">
+          <option value="verification" data-i18n="sup.dVerif">Верификация (голубая галочка)</option>
+          <option value="sales" data-i18n="sup.dSales">Продажи и сделки</option>
+          <option value="ban" data-i18n="sup.dBan">Блокировки</option>
+          <option value="other" data-i18n="sup.dOther">Прочее</option>
+        </select>
+        <input class="sup-input" id="tk-subject" maxlength="140" data-i18n-ph="sup.subjPh" placeholder="Тема обращения" />
+        <textarea class="sup-textarea" id="tk-text" rows="5" maxlength="3000" data-i18n-ph="sup.textPh" placeholder="Опишите вопрос подробно"></textarea>
+        <button class="btn btn-primary" id="tk-submit" data-i18n="sup.send">Отправить тикет</button>
+        <p id="tk-done" hidden style="color:var(--green);font-size:.9rem" data-i18n="sup.done">Тикет отправлен — поддержка ответит в ближайшее время.</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("tk-submit").addEventListener("click", () => {
+        requireAuth(async (user) => {
+          const subject = document.getElementById("tk-subject").value.trim();
+          const text = document.getElementById("tk-text").value.trim();
+          if (!subject || !text) return;
+          const res = await fetch("/api/support/ticket-create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: "Bearer " + user.token },
+            body: JSON.stringify({ dept: document.getElementById("tk-dept").value, subject, text }),
+          });
+          if (res.ok) {
+            document.getElementById("tk-subject").value = "";
+            document.getElementById("tk-text").value = "";
+            document.getElementById("tk-done").hidden = false;
+          } else {
+            alert(t("auth.errNet"));
+          }
+        });
+      });
+    });
+  </script>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="copy" data-i18n="footer.copy">© 2026 Myavka.safe — все права защищены</div>
+    </div>
+  </footer>
+  <script src="js/app.js"></script>
+</body>
+</html>

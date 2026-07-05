@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Myavka.safe — Гарант безопасных сделок</title>
+  <meta name="description" content="Myavka.safe — эскроу-сервис для безопасных онлайн-сделок. Вход через Telegram, оплата Kaspi, защита от мошенников." />
+  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") === "light" ? "light" : "dark";</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Archivo:wdth,wght@100..125,500..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">M</span>Myavka<span class="safe">.safe</span></a>
+      <nav class="nav">
+        <a href="index.html" class="active" data-i18n="nav.home">Главная</a>
+        <a href="catalog.html" data-i18n="nav.catalog">Каталог</a>
+        <a href="chats.html" data-i18n="nav.chats">Чаты</a>
+        <a href="blacklist.html" data-i18n="nav.blacklist">Чёрный список</a>
+        <a href="faq.html" data-i18n="nav.faq">FAQ</a>
+      </nav>
+      <div class="header-controls">
+        <select class="lang-select" id="lang-select">
+          <option value="ru">RU</option>
+          <option value="kz">KZ</option>
+          <option value="en">EN</option>
+        </select>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Тема">☀</button>
+        <a href="#" class="btn btn-tg" data-i18n="nav.login">Войти через Telegram</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="promo">
+    <div class="container">
+      <div class="promo-slider" id="promo-slider">
+        <div class="promo-track" id="promo-track">
+          <a class="promo-slide slide-ml" href="lots.html?g=ml&s=diamonds">
+            <span class="promo-tag">Mobile Legends</span>
+            <span class="promo-title" data-i18n="promo.s1t">Донат алмазов<br />за 30 минут</span>
+            <span class="promo-sub" data-i18n="promo.s1">Официальный донат на ваш ID под защитой эскроу</span>
+          </a>
+          <a class="promo-slide slide-tgp" href="lots.html?g=tg&s=premium">
+            <span class="promo-tag">Telegram</span>
+            <span class="promo-title" data-i18n="promo.s2t">Premium и Stars<br />без переплат</span>
+            <span class="promo-sub" data-i18n="promo.s2">Подарком через Fragment — активация за 10 минут</span>
+          </a>
+          <a class="promo-slide slide-pubg" href="lots.html?g=pubg&s=uc">
+            <span class="promo-tag">PUBG Mobile</span>
+            <span class="promo-title" data-i18n="promo.s3t">UC по лучшему<br />курсу</span>
+            <span class="promo-sub" data-i18n="promo.s3">Зачисление через ID за 15 минут, гарантия сервиса</span>
+          </a>
+        </div>
+        <div class="promo-dots" id="promo-dots"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section home">
+    <div class="container home-grid">
+      <div class="home-catalog">
+        <h2 class="home-h" data-i18n="cat.title">Каталог</h2>
+        <p class="home-sub" data-i18n="cat.sub">Выберите сервис или сразу нужную услугу</p>
+        <div id="catalog-page" class="home-svc-list"></div>
+      </div>
+      <aside class="home-side">
+        <div class="side-card">
+          <h3 data-i18n="home.stats">Статистика сервиса</h3>
+          <div class="side-stats">
+            <div class="stat"><div class="num">12 400+</div><div class="label" data-i18n="hero.stat1">успешных сделок</div></div>
+            <div class="stat"><div class="num">98,7%</div><div class="label" data-i18n="hero.stat2">сделок без споров</div></div>
+            <div class="stat"><div class="num">24/7</div><div class="label" data-i18n="hero.stat3">администраторы онлайн</div></div>
+            <div class="stat"><div class="num" data-i18n="hero.stat4n">до 5 мин</div><div class="label" data-i18n="hero.stat4">ответ администратора</div></div>
+          </div>
+        </div>
+        <div class="side-card">
+          <h3 data-i18n="how.title">Как это работает</h3>
+          <ol class="side-steps">
+            <li><b data-i18n="how.s1t">Договоритесь</b><span data-i18n="how.s1">Найдите лот в каталоге или создайте сделку с контрагентом напрямую.</span></li>
+            <li><b data-i18n="how.s2t">Оплата в эскроу</b><span data-i18n="how.s2">Покупатель оплачивает через Kaspi — деньги замораживаются на счёте гаранта.</span></li>
+            <li><b data-i18n="how.s3t">Передача товара</b><span data-i18n="how.s3">Продавец передаёт товар или выполняет услугу прямо в чате сделки.</span></li>
+            <li><b data-i18n="how.s4t">Деньги продавцу</b><span data-i18n="how.s4">Покупатель подтверждает получение — гарант переводит деньги продавцу.</span></li>
+          </ol>
+        </div>
+        <div class="side-card">
+          <h3 data-i18n="price.title">Тарифы</h3>
+          <div class="side-tariffs">
+            <div class="side-tariff"><span data-i18n="price.std">Стандарт</span><b>7%</b></div>
+            <div class="side-tariff"><span data-i18n="price.admin">С администратором</span><b>8%</b></div>
+            <div class="side-tariff"><span data-i18n="price.vip">VIP-продавец</span><b>−2%</b></div>
+          </div>
+        </div>
+        <div class="side-card">
+          <h3 data-i18n="nav.blacklist">Чёрный список</h3>
+          <p class="side-note" data-i18n="why.c5">Открытая база мошенников — проверьте контрагента по Telegram, телефону или Kaspi.</p>
+          <a class="btn btn-outline btn-sm" href="blacklist.html" data-i18n="bl.check">Проверить</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="col">
+        <a href="index.html" class="logo" style="margin-bottom:10px"><span class="logo-mark">M</span>Myavka<span class="safe">.safe</span></a>
+        <p style="color:var(--muted);font-size:.85rem;max-width:260px" data-i18n="footer.tagline">Гарант-сервис безопасных онлайн-сделок. Казахстан, СНГ.</p>
+      </div>
+      <div class="col">
+        <h4 data-i18n="footer.service">Сервис</h4>
+        <a href="catalog.html" data-i18n="nav.catalog">Каталог</a>
+        <a href="chats.html" data-i18n="nav.chats">Чаты</a>
+        <a href="blacklist.html" data-i18n="nav.blacklist">Чёрный список</a>
+      </div>
+      <div class="col">
+        <h4 data-i18n="footer.help">Помощь</h4>
+        <a href="faq.html" data-i18n="nav.faq">FAQ</a>
+        <a href="faq.html#support" data-i18n="footer.support">Поддержка</a>
+        <a href="#" data-i18n="footer.rules">Правила сервиса</a>
+      </div>
+      <div class="col">
+        <h4 data-i18n="footer.contacts">Контакты</h4>
+        <a href="https://t.me/myavka_safe_bot" target="_blank" data-i18n="footer.bot">Telegram-бот</a>
+        <a href="#" data-i18n="footer.news">Канал новостей</a>
+        <a href="#">support@myavka.safe</a>
+      </div>
+      <div class="copy" data-i18n="footer.copy">© 2026 Myavka.safe — все права защищены</div>
+    </div>
+  </footer>
+  <script src="js/app.js"></script>
+  <script src="js/catalog.js"></script>
+</body>
+</html>

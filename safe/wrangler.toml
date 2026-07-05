@@ -1,0 +1,15 @@
+name = "myavka-safe"
+compatibility_date = "2026-07-01"
+pages_build_output_dir = "site"
+
+[[kv_namespaces]]
+binding = "CHAT"
+id = "01ef3f241bb74e81919735db6e0861fd"
+
+[[durable_objects.bindings]]
+name = "CHAT_DO"
+class_name = "ChatRoom"
+script_name = "myavka-chat-do"
+
+# Секреты (задаются через `wrangler pages secret put` или в дашборде Cloudflare):
+# TELEGRAM_BOT_TOKEN — токен бота от @BotFather

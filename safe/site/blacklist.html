@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Чёрный список — Myavka.safe</title>
+  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") === "light" ? "light" : "dark";</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Archivo:wdth,wght@100..125,500..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">M</span>Myavka<span class="safe">.safe</span></a>
+      <nav class="nav">
+        <a href="index.html" data-i18n="nav.home">Главная</a>
+        <a href="catalog.html" data-i18n="nav.catalog">Каталог</a>
+        <a href="chats.html" data-i18n="nav.chats">Чаты</a>
+        <a href="blacklist.html" class="active" data-i18n="nav.blacklist">Чёрный список</a>
+        <a href="faq.html" data-i18n="nav.faq">FAQ</a>
+      </nav>
+      <div class="header-controls">
+        <select class="lang-select" id="lang-select">
+          <option value="ru">RU</option>
+          <option value="kz">KZ</option>
+          <option value="en">EN</option>
+        </select>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Тема">☀</button>
+        <a href="#" class="btn btn-tg" data-i18n="nav.login">Войти через Telegram</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container page-head" style="text-align:center">
+    <h1 data-i18n="bl.title">Чёрный список</h1>
+    <p data-i18n="bl.sub">Проверьте контрагента перед сделкой — по Telegram, номеру телефона или Kaspi</p>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="bl-search search"><input type="text" data-i18n-ph="bl.searchPh" placeholder="@username, Telegram ID, +7 700 …, или номер Kaspi" /><button class="btn btn-primary btn-sm" data-i18n="bl.check">Проверить</button></div>
+
+      <h2 style="font-size:1.3rem;text-align:left;margin-bottom:18px" data-i18n="bl.recent">Последние записи</h2>
+      <table class="bl-table">
+        <thead>
+          <tr><th data-i18n="bl.date">Дата</th><th data-i18n="bl.id">Идентификатор</th><th>Telegram ID</th><th data-i18n="bl.reason">Причина</th><th data-i18n="bl.status">Статус</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>02.07.2026</td><td>@fake_seller_777</td><td>7482913056</td><td>Не выполнил услугу после получения предоплаты вне сервиса</td><td><span class="badge-danger">Мошенник</span></td></tr>
+          <tr><td>30.06.2026</td><td>+7 707 *** ** 12</td><td>6091254783</td><td>Восстановил проданный аккаунт через поддержку игры</td><td><span class="badge-danger">Мошенник</span></td></tr>
+          <tr><td>28.06.2026</td><td>@ml_boost_cheap</td><td>5738204916</td><td>Подделка скриншотов выполнения буста</td><td><span class="badge-danger">Мошенник</span></td></tr>
+          <tr><td>25.06.2026</td><td>@tg_premium_low</td><td>7015648392</td><td>Оплата Premium с краденых карт — подписка отозвана</td><td><span class="badge-danger">Мошенник</span></td></tr>
+          <tr><td>21.06.2026</td><td>+7 701 *** ** 45</td><td>6845127930</td><td>Множественные аккаунты для накрутки рейтинга</td><td><span class="badge-danger">Мошенник</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="copy" data-i18n="footer.copy">© 2026 Myavka.safe — все права защищены</div>
+    </div>
+  </footer>
+  <script src="js/app.js"></script>
+</body>
+</html>
