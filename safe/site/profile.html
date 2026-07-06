@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Профиль — Myavka.safe</title>
+  <meta name="robots" content="noindex" />
+  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") === "light" ? "light" : "dark";</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Archivo:wdth,wght@100..125,500..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">M</span>Myavka<span class="safe">.safe</span></a>
+      <nav class="nav">
+        <a href="index.html" data-i18n="nav.home">Главная</a>
+        <a href="catalog.html" data-i18n="nav.catalog">Каталог</a>
+        <a href="chats.html" data-i18n="nav.chats">Чаты</a>
+        <a href="blacklist.html" data-i18n="nav.blacklist">Чёрный список</a>
+        <a href="faq.html" data-i18n="nav.faq">FAQ</a>
+      </nav>
+      <div class="header-controls">
+        <select class="lang-select" id="lang-select">
+          <option value="ru">RU</option>
+          <option value="kz">KZ</option>
+          <option value="en">EN</option>
+        </select>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Тема">☀</button>
+        <a href="#" class="btn btn-tg" data-i18n="nav.login">Войти через Telegram</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container" style="padding-top:24px;padding-bottom:60px">
+    <h1 id="profile-title" style="font-size:1.55rem;font-weight:800;letter-spacing:-0.03em;padding:0 0 20px">…</h1>
+
+    <!-- Свой профиль -->
+    <div id="profile-own" hidden>
+      <div class="profile-head">
+        <div class="profile-rows">
+          <div class="profile-row"><span class="k" data-i18n="profile.created">Дата создания аккаунта</span><b id="p-created">—</b></div>
+          <div class="profile-row"><span class="k" data-i18n="profile.tgid">Telegram ID</span><b id="p-tgid">—</b> <span style="color:var(--muted);font-size:.78rem" data-i18n="profile.tgidHint">Виден только вам</span></div>
+        </div>
+        <button class="btn btn-outline btn-sm" id="p-logout" style="align-self:flex-start;margin-top:12px" data-i18n="profile.logout">Выйти из аккаунта</button>
+      </div>
+
+      <div class="profile-visibility">
+        <label class="filter-check">
+          <input type="checkbox" id="p-visibility-toggle" />
+          <span data-i18n="profile.hideListings">Скрыть мои объявления в публичном профиле</span>
+        </label>
+      </div>
+
+      <h2 class="home-h" data-i18n="profile.myLots">Мои объявления</h2>
+      <div id="p-lot-list" class="lot-list" style="margin:14px 0 26px"></div>
+
+      <div class="side-card">
+        <h3 data-i18n="profile.addLot">Добавить объявление</h3>
+        <form id="p-lot-form" class="profile-lot-form">
+          <input class="sup-input" type="text" id="lot-game" data-i18n-ph="profile.gamePh" placeholder="Игра" required />
+          <input class="sup-input" type="text" id="lot-title" data-i18n-ph="profile.titlePh" placeholder="Название" required />
+          <input class="sup-input" type="number" id="lot-price" min="0" step="1" data-i18n-ph="profile.pricePh" placeholder="Цена, ₸" required />
+          <textarea class="sup-textarea" id="lot-desc" rows="2" data-i18n-ph="profile.descPh" placeholder="Описание (необязательно)"></textarea>
+          <div class="modal-error" id="lot-form-err" hidden></div>
+          <button class="btn btn-primary btn-sm" type="submit" style="align-self:flex-start" data-i18n="profile.addLotBtn">Добавить</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Чужой профиль (только просмотр) -->
+    <div id="profile-public" hidden>
+      <div id="p-public-hidden-note" class="empty-note" hidden data-i18n="profile.hiddenNote">Пользователь скрыл свои объявления</div>
+      <div id="p-public-empty-note" class="empty-note" hidden data-i18n="profile.publicNoLots">У пользователя нет активных объявлений</div>
+      <div id="p-public-lot-list" class="lot-list"></div>
+    </div>
+
+    <!-- Профиль не найден / нужен вход -->
+    <div id="profile-error" class="empty-note" hidden data-i18n="profile.notFound">Профиль не найден</div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="copy" data-i18n="footer.copy">© 2026 Myavka.safe — все права защищены</div>
+    </div>
+  </footer>
+  <script src="js/app.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>

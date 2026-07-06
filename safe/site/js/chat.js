@@ -17,7 +17,7 @@ const cache = {}; // roomId -> msgs
 
 let me = null; // ник авторизованного пользователя (задаётся после входа)
 
-const escHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+// escHtml — общая функция из app.js (подключается раньше на всех страницах)
 
 function renderMedia(m) {
   if (!m.media) return "";

@@ -36,38 +36,36 @@ export async function onRequestPost({ request, env }) {
 
   const isOwner = chatId === OWNER_ID;
   const isAdmin = isOwner || Boolean(await env.CHAT.get(`admin:${chatId}`));
-  const norm = (n) => String(n || "").replace(/^@/, "").toLowerCase();
+  // Ники теперь произвольные (в т.ч. с заглавными буквами) и регистрозависимы —
+  // здесь только убираем случайный "@" перед ником, регистр не трогаем.
+  const norm = (n) => String(n || "").replace(/^@/, "");
 
   let text;
   switch (cmd) {
     case "/start":
     case "/login": {
-      // Выдаём персональную ссылку для входа на сайт (код привязан к Telegram ID)
-      const uname = (message.from?.username || "").toLowerCase();
-      const nick = /^[a-z0-9_]{3,32}$/.test(uname) ? uname : `id${message.from.id}`;
-      const key = `unick:${nick}`;
-      const acc = JSON.parse((await env.CHAT.get(key)) || "null");
-      if (!acc) {
-        await env.CHAT.put(key, JSON.stringify({ tgId: String(message.from.id), balance: 0, created: Date.now() }));
-      } else if (acc.tgId !== String(message.from.id)) {
-        text = "⛔ Этот ник уже привязан к другому Telegram-аккаунту.";
-        break;
-      }
+      // Выдаём персональную ссылку для входа на сайт (код привязан к Telegram ID,
+      // а не к Telegram username — username нигде не сохраняется и не показывается).
+      const tgId = String(message.from.id);
+      const existingNick = await env.CHAT.get(`tgid:${tgId}`);
       const code = toHex(crypto.getRandomValues(new Uint8Array(16)));
-      await env.CHAT.put(`login:${code}`, JSON.stringify({ nick }), { expirationTtl: 300 });
+      await env.CHAT.put(`login:${code}`, JSON.stringify({ tgId }), { expirationTtl: 300 });
+      const msg = existingNick
+        ? `🛡️ Myavka.safe — гарант безопасных сделок.\n\nВаш профиль: @${existingNick}\nНажмите кнопку ниже — сайт откроется уже с вашим профилем.\nСсылка одноразовая и действует 5 минут — никому её не передавайте.\n\nНовая ссылка — /login. Команды — /help`
+        : `🛡️ Myavka.safe — гарант безопасных сделок.\n\nВы ещё не зарегистрированы. Нажмите кнопку ниже, войдите на сайт и придумайте себе ник — им будут видеть вас другие пользователи (Telegram-логин при этом останется скрытым).\nСсылка одноразовая и действует 5 минут — никому её не передавайте.\n\nНовая ссылка — /login. Команды — /help`;
       await reply(
         env,
         chatId,
-        `🛡️ Myavka.safe — гарант безопасных сделок.\n\nВаш профиль: @${nick}\nНажмите кнопку ниже — сайт откроется уже с вашим профилем.\nСсылка одноразовая и действует 5 минут — никому её не передавайте.\n\nНовая ссылка — /login. Команды — /help`,
+        msg,
         { inline_keyboard: [[{ text: "🔐 Войти на сайт", url: `${siteUrl}/?login=${code}` }]] }
       );
       return Response.json({ ok: true });
     }
     case "/balance": {
-      const nick = message.from?.username?.toLowerCase();
-      const key = `unick:${/^[a-z0-9_]{3,32}$/.test(nick || "") ? nick : `id${message.from.id}`}`;
-      const acc = JSON.parse((await env.CHAT.get(key)) || "null");
-      text = acc ? `💰 Ваш баланс: ${acc.balance || 0} ₸` : "Вы ещё не зарегистрированы — войдите через сайт.";
+      const tgId = String(message.from.id);
+      const nick = await env.CHAT.get(`tgid:${tgId}`);
+      const acc = nick ? JSON.parse((await env.CHAT.get(`unick:${nick}`)) || "null") : null;
+      text = acc ? `💰 Ваш баланс: ${acc.balance || 0} ₸` : "Вы ещё не зарегистрированы — войдите через сайт (/login).";
       break;
     }
     case "/credit": {

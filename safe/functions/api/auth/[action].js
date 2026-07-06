@@ -32,18 +32,68 @@ export async function onRequestPost({ env, params, request }) {
     if (!/^[0-9a-f]{32}$/.test(code)) return Response.json({ error: "bad_code" }, { status: 400 });
     const raw = await env.CHAT.get(`login:${code}`);
     if (!raw) return Response.json({ error: "expired" }, { status: 410 });
-    const { nick } = JSON.parse(raw);
+    const { tgId } = JSON.parse(raw);
     await env.CHAT.delete(`login:${code}`); // ссылка одноразовая
+
+    const nick = await env.CHAT.get(`tgid:${tgId}`);
+    if (!nick) {
+      // Аккаунта ещё нет — пользователь должен придумать ник (set-nick).
+      const regToken = toHex(crypto.getRandomValues(new Uint8Array(16)));
+      await env.CHAT.put(`reg:${regToken}`, tgId, { expirationTtl: 300 });
+      return Response.json({ ok: true, needsNick: true, regToken });
+    }
     const token = await createSession(env, nick);
     const acc = JSON.parse((await env.CHAT.get(`unick:${nick}`)) || "{}");
     return Response.json({ ok: true, nick: "@" + nick, token, balance: acc.balance || 0 });
+  }
+
+  if (action === "set-nick") {
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return Response.json({ error: "bad_json" }, { status: 400 });
+    }
+    const regToken = String(body.regToken || "");
+    if (!/^[0-9a-f]{32}$/.test(regToken)) return Response.json({ ok: false, error: "expired" }, { status: 400 });
+    const tgId = await env.CHAT.get(`reg:${regToken}`);
+    if (!tgId) return Response.json({ ok: false, error: "expired" }, { status: 410 });
+
+    const nick = String(body.nick || "");
+    if (!/^[a-zA-Z0-9_]{3,20}$/.test(nick)) return Response.json({ ok: false, error: "invalid" }, { status: 400 });
+
+    // На случай гонки: у этого tgId уже мог появиться ник между reg и set-nick.
+    const alreadyNick = await env.CHAT.get(`tgid:${tgId}`);
+    if (alreadyNick) {
+      await env.CHAT.delete(`reg:${regToken}`);
+      const token = await createSession(env, alreadyNick);
+      const acc = JSON.parse((await env.CHAT.get(`unick:${alreadyNick}`)) || "{}");
+      return Response.json({ ok: true, nick: "@" + alreadyNick, token, balance: acc.balance || 0 });
+    }
+
+    const taken = await env.CHAT.get(`unick:${nick}`);
+    if (taken) return Response.json({ ok: false, error: "taken" }, { status: 409 });
+
+    await env.CHAT.put(`unick:${nick}`, JSON.stringify({ tgId, balance: 0, created: Date.now(), listingsPublic: true }));
+    await env.CHAT.put(`tgid:${tgId}`, nick);
+    await env.CHAT.delete(`reg:${regToken}`);
+
+    const token = await createSession(env, nick);
+    return Response.json({ ok: true, nick: "@" + nick, token, balance: 0 });
   }
 
   if (action === "me") {
     const nick = await getSessionNick(env, request);
     if (!nick) return Response.json({ error: "unauthorized" }, { status: 401 });
     const acc = JSON.parse((await env.CHAT.get(`unick:${nick}`)) || "{}");
-    return Response.json({ ok: true, nick: "@" + nick, balance: acc.balance || 0 });
+    return Response.json({
+      ok: true,
+      nick: "@" + nick,
+      balance: acc.balance || 0,
+      tgId: acc.tgId || null,
+      created: acc.created || null,
+      listingsPublic: acc.listingsPublic !== false,
+    });
   }
 
   return Response.json({ error: "unknown_action" }, { status: 404 });

@@ -47,9 +47,13 @@ safe/
 
 | Префикс ключа | Значение | Где используется |
 |---|---|---|
-| `unick:<nick>` | `{tgId, balance, created, verified}` — аккаунт пользователя | auth, chat, telegram, deals |
-| `session:<token>` | `nick` — сессия пользователя (token = 64 hex, TTL 30д) | auth, chat, deals, support |
-| `login:<code>` | `{nick}` — одноразовый код входа (32 hex, TTL 300с) | telegram (выдаёт), auth (гасит) |
+| `unick:<nick>` | `{tgId, balance, created, verified, listingsPublic}` — аккаунт пользователя. `nick` придуман пользователем (НЕ telegram username), **регистрозависим** (`Nick`≠`nick`). `listingsPublic` (bool, дефолт true) — показывать ли объявления в публичном профиле | auth, chat, telegram, deals, lots |
+| `session:<token>` | `nick` — сессия пользователя (token = 64 hex, TTL 30д) | auth, chat, deals, support, lots |
+| `login:<code>` | `{tgId}` — одноразовый код входа (16/32 hex, TTL 300с). Хранит **tgId**, а не nick (ник выбирается на сайте) | telegram (выдаёт), auth (гасит) |
+| `tgid:<tgId>` | `nick` — обратный индекс Telegram ID → выбранный ник (без TTL) | telegram, auth |
+| `reg:<token>` | `tgId` — временный рег-токен между входом и выбором ника (32 hex, TTL 300с) | auth |
+| `lot:<id>` | `{id, owner, game, title, price, desc, active, created}` — объявление (лот), owner = nick | lots |
+| `ulots:<nick>` | `[<lotId>, ...]` — индекс id объявлений владельца | lots |
 | `admin:<telegram_id>` | `{by, ts}` — администратор бота | telegram, deals (рассылка) |
 | `ban:<nick>` | `{by, ts, ...}` — заблокированный пользователь | telegram, chat, deals |
 | `banned_acc:<accountId>` | `{reason, ts}` — украденный/возвращённый аккаунт | telegram, deals |
@@ -62,8 +66,14 @@ safe/
 
 | Endpoint | Метод | Назначение |
 |---|---|---|
-| `/api/auth/tg-login` | POST | обмен `login`-кода на сессию |
-| `/api/auth/me` | POST (Bearer) | текущий пользователь + баланс |
+| `/api/auth/tg-login` | POST | обмен `login`-кода на сессию; если ника нет → `{needsNick, regToken}` |
+| `/api/auth/set-nick` | POST | выбор придуманного ника: `{regToken, nick}` → сессия (ошибки taken/invalid/expired) |
+| `/api/auth/me` | POST (Bearer) | текущий пользователь: `{nick, balance, tgId, created, listingsPublic}` (tgId — только владельцу) |
+| `/api/lots/create` | POST (Bearer) | создать объявление `{game, title, price, desc?}` |
+| `/api/lots/mine` | POST (Bearer) | все свои объявления (active + inactive) |
+| `/api/lots/toggle` | POST (Bearer) | переключить active/inactive свой лот `{id}` |
+| `/api/lots/visibility` | POST (Bearer) | скрыть/показать свои объявления `{public}` |
+| `/api/lots/by-owner` | GET `?nick=` | публично: только активные лоты владельца (пусто, если скрыто) |
 | `/api/chat/:room` | GET `?since=` / POST (Bearer) | сообщения комнаты / отправка |
 | `/api/deals/complete` | POST (Bearer) | завершить сделку, проверить аккаунт по бан-базе |
 | `/api/media/:id` | GET | отдать вложение |
@@ -75,6 +85,12 @@ safe/
 - Bearer-токены пользователя валидируются регэкспом `^[0-9a-f]{64}$` до похода в KV.
 - Флаг `verified` и любые привилегии берутся **только с сервера** (`unick:`),
   клиент не может их прислать. Не доверяй полям из тела запроса для прав доступа.
+- **Telegram @username НЕ хранится и НЕ отдаётся клиенту** — идентификация только
+  через придуманный ник. `tgId` возвращается **только владельцу** в его `/api/auth/me`
+  (нигде публично — иначе можно обойти гарант и написать в личку). Владелец лота/действия
+  берётся из сессии, никогда из тела запроса.
+- Ники **регистрозависимы** — нигде не применяй `.toLowerCase()` к нику пользователя
+  перед обращением к KV (`unick:`/`tgid:`/`session:`/`ulots:`/`ban:`), иначе рассинхрон.
 - Пароли сотрудников — **только PBKDF2** (см. `support/[action].js`), не хранить в открытом виде.
 - Во фронтенде любой пользовательский текст экранируется `escHtml` перед вставкой в DOM.
 - Права в боте: `OWNER_ID` (глава) > `admin:<id>` (администраторы). Не понижай проверки.

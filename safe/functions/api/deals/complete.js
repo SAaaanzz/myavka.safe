@@ -37,7 +37,7 @@ export async function onRequestPost({ env, request }) {
     return Response.json({ error: "bad_json" }, { status: 400 });
   }
   const accountId = String(body.accountId || "").trim().slice(0, 64);
-  const seller = String(body.seller || "").replace(/^@/, "").toLowerCase().slice(0, 32);
+  const seller = String(body.seller || "").replace(/^@/, "").slice(0, 32);
   const title = String(body.title || "").slice(0, 120);
   if (!accountId || !seller) return Response.json({ error: "bad_request" }, { status: 400 });
 

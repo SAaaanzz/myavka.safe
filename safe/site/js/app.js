@@ -163,6 +163,35 @@ const I18N = {
     "sup.textPh": "Опишите вопрос подробно",
     "sup.send": "Отправить тикет",
     "sup.done": "Тикет отправлен — поддержка ответит в ближайшее время.",
+
+    "nick.title": "Придумайте ник",
+    "nick.lead": "Ник виден всем в чатах и объявлениях вместо вашего логина Telegram. От 3 до 20 символов: латинские буквы, цифры, подчёркивание.",
+    "nick.nickPh": "Например, dragon_slayer",
+    "nick.save": "Сохранить",
+    "nick.errInvalid": "Ник должен содержать 3–20 символов: латиница, цифры, подчёркивание",
+    "nick.errTaken": "Этот ник уже занят — выберите другой",
+
+    "profile.created": "Дата создания аккаунта",
+    "profile.tgid": "Telegram ID",
+    "profile.tgidHint": "Виден только вам",
+    "profile.hideListings": "Скрыть мои объявления в публичном профиле",
+    "profile.myLots": "Мои объявления",
+    "profile.addLot": "Добавить объявление",
+    "profile.gamePh": "Игра",
+    "profile.titlePh": "Название",
+    "profile.pricePh": "Цена, ₸",
+    "profile.descPh": "Описание (необязательно)",
+    "profile.addLotBtn": "Добавить",
+    "profile.active": "Активно",
+    "profile.inactive": "Неактивно",
+    "profile.deactivate": "Сделать неактивным",
+    "profile.activate": "Сделать активным",
+    "profile.noLots": "У вас пока нет объявлений",
+    "profile.hiddenNote": "Пользователь скрыл свои объявления",
+    "profile.publicNoLots": "У пользователя нет активных объявлений",
+    "profile.logout": "Выйти из аккаунта",
+    "profile.errEmpty": "Заполните игру, название и цену",
+    "profile.notFound": "Профиль не найден",
   },
   kz: {
     "nav.home": "Басты бет",
@@ -327,6 +356,35 @@ const I18N = {
     "sup.textPh": "Сұрағыңызды толық сипаттаңыз",
     "sup.send": "Тикет жіберу",
     "sup.done": "Тикет жіберілді — қолдау жақын арада жауап береді.",
+
+    "nick.title": "Никнейм ойлап табыңыз",
+    "nick.lead": "Никнейм чаттар мен хабарландыруларда Telegram логиныңыздың орнына барлығына көрінеді. 3–20 таңба: латын әріптері, сандар, астыңғы сызық.",
+    "nick.nickPh": "Мысалы, dragon_slayer",
+    "nick.save": "Сақтау",
+    "nick.errInvalid": "Никнейм 3–20 таңбадан тұруы керек: латын әріптері, сандар, астыңғы сызық",
+    "nick.errTaken": "Бұл никнейм бос емес — басқасын таңдаңыз",
+
+    "profile.created": "Аккаунт құрылған күні",
+    "profile.tgid": "Telegram ID",
+    "profile.tgidHint": "Тек өзіңізге көрінеді",
+    "profile.hideListings": "Хабарландыруларымды жария профильде жасыру",
+    "profile.myLots": "Менің хабарландыруларым",
+    "profile.addLot": "Хабарландыру қосу",
+    "profile.gamePh": "Ойын",
+    "profile.titlePh": "Атауы",
+    "profile.pricePh": "Бағасы, ₸",
+    "profile.descPh": "Сипаттама (міндетті емес)",
+    "profile.addLotBtn": "Қосу",
+    "profile.active": "Белсенді",
+    "profile.inactive": "Белсенді емес",
+    "profile.deactivate": "Белсенді емес ету",
+    "profile.activate": "Белсенді ету",
+    "profile.noLots": "Сізде әзірге хабарландыру жоқ",
+    "profile.hiddenNote": "Пайдаланушы хабарландыруларын жасырды",
+    "profile.publicNoLots": "Пайдаланушыда белсенді хабарландырулар жоқ",
+    "profile.logout": "Аккаунттан шығу",
+    "profile.errEmpty": "Ойын, атауы және бағасын толтырыңыз",
+    "profile.notFound": "Профиль табылмады",
   },
   en: {
     "nav.home": "Home",
@@ -491,8 +549,40 @@ const I18N = {
     "sup.textPh": "Describe your issue in detail",
     "sup.send": "Submit ticket",
     "sup.done": "Ticket sent — support will reply shortly.",
+
+    "nick.title": "Choose a nickname",
+    "nick.lead": "Your nickname is shown to everyone in chats and listings instead of your Telegram login. 3–20 characters: Latin letters, digits, underscore.",
+    "nick.nickPh": "e.g. dragon_slayer",
+    "nick.save": "Save",
+    "nick.errInvalid": "Nickname must be 3–20 characters: Latin letters, digits, underscore",
+    "nick.errTaken": "This nickname is already taken — choose another one",
+
+    "profile.created": "Account created",
+    "profile.tgid": "Telegram ID",
+    "profile.tgidHint": "Visible only to you",
+    "profile.hideListings": "Hide my listings from my public profile",
+    "profile.myLots": "My listings",
+    "profile.addLot": "Add a listing",
+    "profile.gamePh": "Game",
+    "profile.titlePh": "Title",
+    "profile.pricePh": "Price, ₸",
+    "profile.descPh": "Description (optional)",
+    "profile.addLotBtn": "Add",
+    "profile.active": "Active",
+    "profile.inactive": "Inactive",
+    "profile.deactivate": "Deactivate",
+    "profile.activate": "Activate",
+    "profile.noLots": "You don't have any listings yet",
+    "profile.hiddenNote": "This user has hidden their listings",
+    "profile.publicNoLots": "This user has no active listings",
+    "profile.logout": "Log out",
+    "profile.errEmpty": "Fill in game, title, and price",
+    "profile.notFound": "Profile not found",
   },
 };
+
+// Экранирование пользовательского текста перед вставкой в DOM (единая версия для всех страниц)
+const escHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 function getLang() {
   const l = localStorage.getItem("lang");
@@ -567,6 +657,61 @@ function showAuthModal(onSuccess, onCancel) {
   wrap.addEventListener("click", (e) => { if (e.target === wrap) { close(); onCancel?.(); } });
 }
 
+// Модалка «придумайте ник» — показывается, когда tg-login вернул needsNick:true
+// (аккаунта в Telegram ещё нет никнейма). Пока ник не задан, сессии/токена тоже нет.
+function showNickModal(regToken) {
+  document.getElementById("nick-modal")?.remove();
+  const wrap = document.createElement("div");
+  wrap.id = "nick-modal";
+  wrap.className = "modal-overlay";
+  wrap.innerHTML = `
+    <div class="modal">
+      <h3>${t("nick.title")}</h3>
+      <p>${t("nick.lead")}</p>
+      <input type="text" id="nick-input" maxlength="20" autocomplete="off" placeholder="${t("nick.nickPh")}" />
+      <div class="modal-error" id="nick-error" hidden></div>
+      <button class="btn btn-primary" id="nick-save">${t("nick.save")}</button>
+    </div>`;
+  document.body.appendChild(wrap);
+
+  const errEl = wrap.querySelector("#nick-error");
+  const showErr = (msg) => { errEl.textContent = msg; errEl.hidden = false; };
+  const input = wrap.querySelector("#nick-input");
+
+  const submit = async () => {
+    const nick = input.value.trim();
+    if (!/^[a-zA-Z0-9_]{3,20}$/.test(nick)) { showErr(t("nick.errInvalid")); return; }
+    errEl.hidden = true;
+    try {
+      const res = await fetch("/api/auth/set-nick", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ regToken, nick }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        localStorage.setItem("user", JSON.stringify({ name: data.nick, token: data.token, balance: data.balance || 0 }));
+        localStorage.setItem("chat_name", data.nick);
+        wrap.remove();
+        updateLoginButtons();
+      } else if (data.error === "taken") {
+        showErr(t("nick.errTaken"));
+      } else if (data.error === "invalid") {
+        showErr(t("nick.errInvalid"));
+      } else if (data.error === "expired") {
+        showErr(t("auth.expired"));
+      } else {
+        showErr(t("auth.errNet"));
+      }
+    } catch {
+      showErr(t("auth.errNet"));
+    }
+  };
+
+  wrap.querySelector("#nick-save").addEventListener("click", submit);
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+}
+
 // Вход по одноразовой ссылке из бота (?login=код)
 async function tryLinkLogin() {
   const params = new URLSearchParams(location.search);
@@ -582,7 +727,9 @@ async function tryLinkLogin() {
       body: JSON.stringify({ code }),
     });
     const data = await res.json();
-    if (res.ok && data.ok) {
+    if (res.ok && data.ok && data.needsNick) {
+      showNickModal(data.regToken);
+    } else if (res.ok && data.ok) {
       localStorage.setItem("user", JSON.stringify({ name: data.nick, token: data.token, balance: data.balance || 0 }));
       localStorage.setItem("chat_name", data.nick);
       updateLoginButtons();
@@ -616,13 +763,8 @@ function updateLoginButtons() {
     if (user) {
       btn.textContent = `👤 ${user.name} · ${user.balance ?? 0} ₸`;
       btn.removeAttribute("data-i18n");
-      btn.onclick = (e) => {
-        e.preventDefault();
-        if (confirm(t("auth.logout"))) {
-          localStorage.removeItem("user");
-          location.reload();
-        }
-      };
+      btn.href = "profile.html";
+      btn.onclick = null;
     } else {
       btn.onclick = (e) => { e.preventDefault(); showAuthModal(() => location.reload()); };
     }

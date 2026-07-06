@@ -299,7 +299,7 @@ input.filter {
 /* Lot rows: full-width list, only title + price */
 .lot-list { display: flex; flex-direction: column; gap: 8px; padding-bottom: 64px; }
 .lot-row {
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap; row-gap: 8px;
   background: var(--card);
   border-radius: 16px; padding: 11px 16px;
   transition: box-shadow .15s, transform .15s;
@@ -307,6 +307,34 @@ input.filter {
 .lot-row:hover { box-shadow: var(--shadow); transform: translateX(3px); }
 .lot-row-title { flex: 1; font-weight: 600; font-size: 0.92rem; }
 .lot-row-price { font-weight: 800; font-size: 1rem; white-space: nowrap; }
+.lot-row-game { color: var(--muted); font-size: 0.82rem; white-space: nowrap; }
+.lot-row.inactive { opacity: .55; }
+.lot-status {
+  font-size: 0.74rem; font-weight: 700; padding: 3px 11px; border-radius: 999px; white-space: nowrap;
+}
+.lot-status.active { color: var(--green); background: var(--green-soft); border: 1px solid rgba(61, 220, 132, 0.35); }
+.lot-status.inactive { color: var(--muted); background: var(--card-2); border: 1px solid var(--border-soft); }
+
+/* ---------- Профиль ---------- */
+.profile-head {
+  background: var(--card); border-radius: var(--radius); padding: 22px 24px;
+  display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px;
+}
+.profile-head h1 { font-size: 1.4rem; }
+.profile-rows { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; }
+.profile-row { display: flex; gap: 8px; font-size: 0.9rem; padding: 6px 0; border-bottom: 1px solid var(--border-soft); }
+.profile-row:last-child { border-bottom: 0; }
+.profile-row .k { color: var(--muted); min-width: 200px; }
+.profile-visibility {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  background: var(--card); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px;
+}
+.profile-lot-form {
+  display: flex; flex-direction: column; gap: 10px; margin-top: 12px;
+}
+.profile-lot-form textarea {
+  resize: vertical; min-height: 60px;
+}
 
 /* Breadcrumbs */
 .crumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: var(--muted); font-size: 0.88rem; padding: 26px 0 0; }
