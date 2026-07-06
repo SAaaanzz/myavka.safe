@@ -1,0 +1,30 @@
+name: Deploy to Cloudflare Pages
+
+# Авто-деплой myavka-safe на Cloudflare Pages при каждом пуше в main.
+# Требует один секрет репозитория: CLOUDFLARE_API_TOKEN (право Cloudflare Pages: Edit).
+# Account ID не секретный, поэтому задан здесь напрямую.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ab97371e176030ab556199f93e3588e4
+          workingDirectory: safe
+          # --branch=main обязателен: в CI checkout идёт в detached HEAD,
+          # без него wrangler делает preview-деплой вместо production.
+          command: pages deploy site --project-name=myavka-safe --branch=main --commit-dirty=true
