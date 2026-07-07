@@ -1,5 +1,9 @@
 // Публичный чёрный список: заблокированные пользователи и аккаунты.
 // GET /api/blacklist?q=<nick|accountId> — без авторизации.
+// Точечный поиск (?q=) отдаёт совпадение и по пользователю, и по аккаунту.
+// "recent" (список последних записей без q) отдаёт ТОЛЬКО заблокированных
+// пользователей (ban:*) — banned_acc:* массово не публикуется (антифрод-база
+// accountId не должна собираться целиком со страницы).
 
 const MAX_Q = 64;
 const RECENT_LIMIT = 20;
@@ -46,8 +50,11 @@ export async function onRequestGet({ env, request }) {
     }
   }
 
+  // ВАЖНО (безопасность): "recent" — только заблокированные пользователи (ban:*).
+  // Забаненные аккаунты (banned_acc:*) — это антифрод-база accountId, её нельзя
+  // отдавать целиком публично (иначе злоумышленник соберёт список всех id).
+  // Проверка конкретного accountId возможна только точечно через ?q=<id> (см. matchAccount выше).
   const userKeys = await collectPrefix(env, "ban:");
-  const accKeys = await collectPrefix(env, "banned_acc:");
 
   const entries = [];
 
@@ -58,16 +65,6 @@ export async function onRequestGet({ env, request }) {
       const val = safeParse(raw) || {};
       const id = name.slice("ban:".length);
       entries.push({ type: "user", id, reason: val.reason || "—", ts: val.ts || 0 });
-    })
-  );
-
-  await Promise.all(
-    accKeys.map(async (name) => {
-      const raw = await env.CHAT.get(name);
-      if (!raw) return;
-      const val = safeParse(raw) || {};
-      const id = name.slice("banned_acc:".length);
-      entries.push({ type: "account", id, reason: val.reason || "—", ts: val.ts || 0 });
     })
   );
 
