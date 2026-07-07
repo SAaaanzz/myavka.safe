@@ -134,24 +134,24 @@ async function post(payload) {
 }
 
 // Завершение сделки: ID проданного аккаунта проверяется по бан-базе на сервере
-async function finishDeal(d) {
-  const accountId = prompt(t("chats.accIdPrompt"));
-  if (!accountId) return;
-  try {
-    const res = await fetch("/api/deals/complete", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + (getUser()?.token || ""),
-      },
-      body: JSON.stringify({ accountId, seller: d.name, title: d.paid?.title || "" }),
-    });
-    const data = await res.json();
-    if (!res.ok) { alert(t("auth.errNet")); return; }
-    alert(data.flagged ? t("chats.dealFlagged") : t("chats.dealDone"));
-  } catch {
-    alert(t("auth.errNet"));
-  }
+function finishDeal(d) {
+  showPromptModal(t("chats.accIdPrompt"), t("chats.finishDeal"), async (accountId) => {
+    try {
+      const res = await fetch("/api/deals/complete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + (getUser()?.token || ""),
+        },
+        body: JSON.stringify({ accountId, seller: d.name, title: d.paid?.title || "" }),
+      });
+      const data = await res.json();
+      if (!res.ok) { showInfoModal(t("auth.errNet")); return; }
+      showInfoModal(data.flagged ? t("chats.dealFlagged") : t("chats.dealDone"));
+    } catch {
+      showInfoModal(t("auth.errNet"));
+    }
+  });
 }
 
 function sendMessage() {

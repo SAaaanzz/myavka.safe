@@ -4,7 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FAQ — Myavka.safe</title>
-  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") === "light" ? "light" : "dark";</script>
+  <meta name="description" content="Ответы на частые вопросы о работе эскроу-гаранта Myavka.safe: комиссии, верификация, вывод денег, вызов администратора." />
+  <meta property="og:title" content="FAQ — Myavka.safe" />
+  <meta property="og:description" content="Всё о том, как работает гарант Myavka.safe: комиссии, эскроу-защита, верификация, вывод средств." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Myavka.safe" />
+  <meta name="twitter:card" content="summary" />
+  <script src="js/theme-init.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Archivo:wdth,wght@100..125,500..900&display=swap" rel="stylesheet" />
@@ -86,35 +92,12 @@
     </div>
   </section>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("tk-submit").addEventListener("click", () => {
-        requireAuth(async (user) => {
-          const subject = document.getElementById("tk-subject").value.trim();
-          const text = document.getElementById("tk-text").value.trim();
-          if (!subject || !text) return;
-          const res = await fetch("/api/support/ticket-create", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: "Bearer " + user.token },
-            body: JSON.stringify({ dept: document.getElementById("tk-dept").value, subject, text }),
-          });
-          if (res.ok) {
-            document.getElementById("tk-subject").value = "";
-            document.getElementById("tk-text").value = "";
-            document.getElementById("tk-done").hidden = false;
-          } else {
-            alert(t("auth.errNet"));
-          }
-        });
-      });
-    });
-  </script>
-
   <footer class="footer">
     <div class="container footer-inner">
       <div class="copy" data-i18n="footer.copy">© 2026 Myavka.safe — все права защищены</div>
     </div>
   </footer>
   <script src="js/app.js"></script>
+  <script src="js/faq.js"></script>
 </body>
 </html>

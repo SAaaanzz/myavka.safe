@@ -712,6 +712,58 @@ function showNickModal(regToken) {
   input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
 }
 
+// ---------- Общие модалки (замена alert()/prompt() браузера — совместимость с CSP) ----------
+
+// Модалка с текстовым полем ввода и кнопками «подтвердить»/«отмена».
+// onSubmit(value) вызывается со строкой (уже .trim()); onCancel() — при закрытии без ввода.
+function showPromptModal(message, submitLabel, onSubmit, onCancel) {
+  document.getElementById("prompt-modal")?.remove();
+  const wrap = document.createElement("div");
+  wrap.id = "prompt-modal";
+  wrap.className = "modal-overlay";
+  wrap.innerHTML = `
+    <div class="modal">
+      <p>${escHtml(message)}</p>
+      <input type="text" id="prompt-input" autocomplete="off" />
+      <div class="modal-error" id="prompt-error" hidden></div>
+      <button class="btn btn-primary" id="prompt-submit">${escHtml(submitLabel)}</button>
+      <button class="btn btn-outline" id="prompt-cancel">${t("auth.cancel")}</button>
+    </div>`;
+  document.body.appendChild(wrap);
+  const input = wrap.querySelector("#prompt-input");
+  const close = () => wrap.remove();
+
+  const submit = () => {
+    const value = input.value.trim();
+    if (!value) return;
+    close();
+    onSubmit(value);
+  };
+
+  wrap.querySelector("#prompt-submit").addEventListener("click", submit);
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+  wrap.querySelector("#prompt-cancel").addEventListener("click", () => { close(); onCancel?.(); });
+  wrap.addEventListener("click", (e) => { if (e.target === wrap) { close(); onCancel?.(); } });
+  input.focus();
+}
+
+// Информационная модалка — замена alert(). onClose вызывается при закрытии (кнопкой или оверлеем).
+function showInfoModal(message, onClose) {
+  document.getElementById("info-modal")?.remove();
+  const wrap = document.createElement("div");
+  wrap.id = "info-modal";
+  wrap.className = "modal-overlay";
+  wrap.innerHTML = `
+    <div class="modal">
+      <p>${escHtml(message)}</p>
+      <button class="btn btn-primary" id="info-ok">OK</button>
+    </div>`;
+  document.body.appendChild(wrap);
+  const close = () => { wrap.remove(); onClose?.(); };
+  wrap.querySelector("#info-ok").addEventListener("click", close);
+  wrap.addEventListener("click", (e) => { if (e.target === wrap) close(); });
+}
+
 // Вход по одноразовой ссылке из бота (?login=код)
 async function tryLinkLogin() {
   const params = new URLSearchParams(location.search);
