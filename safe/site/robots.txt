@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
+# ЗАМЕНИТЬ на реальный домен при деплое
 Sitemap: https://myavka.safe/sitemap.xml
