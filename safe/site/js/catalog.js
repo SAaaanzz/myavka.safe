@@ -151,6 +151,88 @@ function renderLotsPage() {
         <span class="lot-row-price">${esc(lot.price)}</span>
       </a>`).join("")
     : `<div class="empty-note">${typeof t === "function" ? t("lots.empty") : "В этой категории пока нет лотов"}</div>`;
+
+  loadRealLots(game.name);
+}
+
+// ---------- Реальные лоты пользователей (GET /api/lots/all) ----------
+// Отображаются отдельным блоком под демо-лотами; клик по ним создаёт сделку
+// (POST /api/deals/create) и ведёт в чат сделки — в отличие от демо-лотов,
+// которые просто ведут на chats.html без реальной сделки.
+let realLotsWrap = null;
+
+function ensureRealLotsWrap(root) {
+  if (realLotsWrap) return realLotsWrap;
+  realLotsWrap = document.createElement("div");
+  realLotsWrap.id = "real-lots-section";
+  realLotsWrap.innerHTML = `<h2 class="home-h" style="margin-top:28px" data-i18n="lots.userLots">${typeof t === "function" ? t("lots.userLots") : "Объявления пользователей"}</h2><div class="lot-list" id="lots-page-real"></div>`;
+  root.parentNode.insertBefore(realLotsWrap, root.nextSibling);
+  // Делегирование клика — переживает перерисовку #lots-page-real
+  realLotsWrap.addEventListener("click", (e) => {
+    const row = e.target.closest("[data-real-lot-id]");
+    if (!row) return;
+    e.preventDefault();
+    buyRealLot(row.dataset.realLotId);
+  });
+  return realLotsWrap;
+}
+
+async function fetchRealLots(gameName) {
+  try {
+    const res = await fetch("/api/lots/all?game=" + encodeURIComponent(gameName) + "&limit=100");
+    const data = await res.json();
+    return data.ok && Array.isArray(data.lots) ? data.lots : [];
+  } catch {
+    return [];
+  }
+}
+
+async function loadRealLots(gameName) {
+  const root = document.getElementById("lots-page");
+  if (!root) return;
+  const wrap = ensureRealLotsWrap(root);
+  const lots = await fetchRealLots(gameName);
+  const list = wrap.querySelector("#lots-page-real");
+  if (!lots.length) {
+    wrap.hidden = true;
+    return;
+  }
+  wrap.hidden = false;
+  list.innerHTML = lots.map((lot) => `<div class="lot-row" data-real-lot-id="${escHtml(lot.id)}" style="cursor:pointer">
+      <span class="avatar av-4">${escHtml((lot.owner || "?")[0].toUpperCase())}</span>
+      <span class="lot-row-title">${escHtml(lot.title)} <span style="color:var(--muted);font-weight:400">— @${escHtml(lot.owner)}</span></span>
+      <span class="lot-row-price">${escHtml(String(lot.price))} ₸</span>
+    </div>`).join("");
+}
+
+// Клик по реальному лоту: требуем вход, создаём сделку, переходим в чат сделки.
+function buyRealLot(lotId) {
+  requireAuth(async () => {
+    try {
+      const res = await fetch("/api/deals/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + (getUser()?.token || ""),
+        },
+        body: JSON.stringify({ lotId }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok && data.deal) {
+        location.href = "chats.html?deal=" + encodeURIComponent(data.deal.id);
+        return;
+      }
+      const errMap = {
+        own_lot: "deal.errOwnLot",
+        seller_banned: "deal.errSellerBanned",
+        lot_inactive: "deal.errLotInactive",
+        lot_not_found: "deal.errNotFound",
+      };
+      showInfoModal(t(errMap[data.error] || "auth.errNet"));
+    } catch {
+      showInfoModal(t("auth.errNet"));
+    }
+  });
 }
 
 renderCatalogPage();

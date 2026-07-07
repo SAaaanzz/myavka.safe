@@ -102,6 +102,7 @@ const I18N = {
     "lots.verified": "Верифицирован",
     "lots.escrow": "Каждая покупка защищена эскроу.",
     "lots.empty": "В этой категории пока нет лотов — станьте первым продавцом!",
+    "lots.userLots": "Объявления пользователей",
 
     "bl.title": "Чёрный список",
     "bl.sub": "Проверьте контрагента перед сделкой — по Telegram, номеру телефона или Kaspi",
@@ -134,7 +135,7 @@ const I18N = {
     "chats.finishDeal": "Завершить сделку",
     "chats.accIdPrompt": "Введите ID проданного аккаунта для проверки по бан-базе:",
     "chats.dealDone": "Сделка завершена. Аккаунт чист — в бан-базе не числится.",
-    "chats.dealFlagged": "⚠️ Аккаунт числится в бан-базе (украден/возвращён)! Администратор уведомлён, продавец заблокирован до разбирательства.",
+    "chats.dealFlagged": "⚠️ Аккаунт числится в бан-базе (украден/возвращён)! Администратор уведомлён и разберётся в ситуации.",
 
     "auth.title": "Вход через Telegram",
     "auth.lead": "Чаты и создание лотов доступны только зарегистрированным. Откройте бота @myavka_safe_bot, нажмите Start — он пришлёт кнопку «Войти на сайт», по ней вы попадёте сюда уже в своём профиле.",
@@ -192,6 +193,18 @@ const I18N = {
     "profile.logout": "Выйти из аккаунта",
     "profile.errEmpty": "Заполните игру, название и цену",
     "profile.notFound": "Профиль не найден",
+    "profile.edit": "Редактировать",
+    "profile.delete": "Удалить",
+    "profile.confirmDelete": "Удалить это объявление?",
+    "profile.editTitle": "Редактировать объявление",
+
+    "deal.errOwnLot": "Нельзя купить собственный лот",
+    "deal.errSellerBanned": "Продавец заблокирован — сделка недоступна",
+    "deal.errLotInactive": "Этот лот сейчас неактивен",
+    "deal.errNotFound": "Лот не найден — возможно, его уже удалили",
+
+    "bl.notFound": "Ничего не найдено — этот контрагент не числится в чёрном списке",
+    "bl.scammer": "Мошенник",
   },
   kz: {
     "nav.home": "Басты бет",
@@ -295,6 +308,7 @@ const I18N = {
     "lots.verified": "Верификацияланған",
     "lots.escrow": "Әр сатып алу эскроумен қорғалған.",
     "lots.empty": "Бұл санатта әзірге лоттар жоқ — алғашқы сатушы болыңыз!",
+    "lots.userLots": "Пайдаланушылар хабарландырулары",
 
     "bl.title": "Қара тізім",
     "bl.sub": "Мәміле алдында контрагентті тексеріңіз — Telegram, телефон нөмірі немесе Kaspi арқылы",
@@ -327,7 +341,7 @@ const I18N = {
     "chats.finishDeal": "Мәмілені аяқтау",
     "chats.accIdPrompt": "Бан-база бойынша тексеру үшін сатылған аккаунт ID-ін енгізіңіз:",
     "chats.dealDone": "Мәміле аяқталды. Аккаунт таза — бан-базада жоқ.",
-    "chats.dealFlagged": "⚠️ Аккаунт бан-базада бар (ұрланған/қайтарылған)! Әкімшіге хабар жіберілді, сатушы бұғатталды.",
+    "chats.dealFlagged": "⚠️ Аккаунт бан-базада бар (ұрланған/қайтарылған)! Әкімшіге хабар жіберілді, ол жағдайды қарастырады.",
 
     "auth.title": "Telegram арқылы кіру",
     "auth.lead": "Чаттар мен лот жасау тек тіркелгендерге қолжетімді. @myavka_safe_bot ботын ашып, Start басыңыз — ол «Сайтқа кіру» батырмасын жібереді, ол арқылы өз профиліңізбен кіресіз.",
@@ -385,6 +399,18 @@ const I18N = {
     "profile.logout": "Аккаунттан шығу",
     "profile.errEmpty": "Ойын, атауы және бағасын толтырыңыз",
     "profile.notFound": "Профиль табылмады",
+    "profile.edit": "Өзгерту",
+    "profile.delete": "Жою",
+    "profile.confirmDelete": "Бұл хабарландыруды жою керек пе?",
+    "profile.editTitle": "Хабарландыруды өзгерту",
+
+    "deal.errOwnLot": "Өз лотыңызды сатып ала алмайсыз",
+    "deal.errSellerBanned": "Сатушы бұғатталған — мәміле қолжетімсіз",
+    "deal.errLotInactive": "Бұл лот қазір белсенді емес",
+    "deal.errNotFound": "Лот табылмады — ол жойылған болуы мүмкін",
+
+    "bl.notFound": "Ештеңе табылмады — бұл контрагент қара тізімде жоқ",
+    "bl.scammer": "Алаяқ",
   },
   en: {
     "nav.home": "Home",
@@ -488,6 +514,7 @@ const I18N = {
     "lots.verified": "Verified",
     "lots.escrow": "Every purchase is protected by escrow.",
     "lots.empty": "No listings in this category yet — be the first seller!",
+    "lots.userLots": "User listings",
 
     "bl.title": "Blacklist",
     "bl.sub": "Check your counterparty before the deal — by Telegram, phone number, or Kaspi",
@@ -520,7 +547,7 @@ const I18N = {
     "chats.finishDeal": "Complete deal",
     "chats.accIdPrompt": "Enter the sold account ID to check against the ban database:",
     "chats.dealDone": "Deal completed. The account is clean — not in the ban database.",
-    "chats.dealFlagged": "⚠️ This account is in the ban database (stolen/returned)! The administrator has been notified and the seller is blocked pending review.",
+    "chats.dealFlagged": "⚠️ This account is in the ban database (stolen/returned)! The administrator has been notified and will look into it.",
 
     "auth.title": "Sign in with Telegram",
     "auth.lead": "Chats and lot creation are for registered users only. Open the @myavka_safe_bot bot, press Start — it sends a «Sign in» button that brings you back here already signed in.",
@@ -578,6 +605,18 @@ const I18N = {
     "profile.logout": "Log out",
     "profile.errEmpty": "Fill in game, title, and price",
     "profile.notFound": "Profile not found",
+    "profile.edit": "Edit",
+    "profile.delete": "Delete",
+    "profile.confirmDelete": "Delete this listing?",
+    "profile.editTitle": "Edit listing",
+
+    "deal.errOwnLot": "You can't buy your own listing",
+    "deal.errSellerBanned": "Seller is banned — deal unavailable",
+    "deal.errLotInactive": "This listing is no longer active",
+    "deal.errNotFound": "Listing not found — it may have already been removed",
+
+    "bl.notFound": "Nothing found — this contact isn't on the blacklist",
+    "bl.scammer": "Scammer",
   },
 };
 

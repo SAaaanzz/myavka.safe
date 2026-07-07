@@ -50,11 +50,86 @@ function renderMyLots() {
       <span class="lot-row-price">${escHtml(String(l.price))} ₸</span>
       <span class="lot-status ${l.active ? "active" : "inactive"}">${l.active ? t("profile.active") : t("profile.inactive")}</span>
       <button class="btn btn-outline btn-sm lot-toggle-btn" data-id="${escHtml(l.id)}">${l.active ? t("profile.deactivate") : t("profile.activate")}</button>
+      <button class="btn btn-outline btn-sm lot-edit-btn" data-id="${escHtml(l.id)}">${t("profile.edit")}</button>
+      <button class="btn btn-outline btn-sm lot-delete-btn" data-id="${escHtml(l.id)}">${t("profile.delete")}</button>
     </div>
   `).join("");
   root.querySelectorAll(".lot-toggle-btn").forEach((btn) => {
     btn.addEventListener("click", () => toggleLot(btn.dataset.id));
   });
+  root.querySelectorAll(".lot-edit-btn").forEach((btn) => {
+    btn.addEventListener("click", () => openEditLotModal(btn.dataset.id));
+  });
+  root.querySelectorAll(".lot-delete-btn").forEach((btn) => {
+    btn.addEventListener("click", () => deleteLot(btn.dataset.id));
+  });
+}
+
+// Модалка редактирования лота (game/title/price/desc) → POST /api/lots/edit
+function openEditLotModal(id) {
+  const lot = myLots.find((l) => l.id === id);
+  if (!lot) return;
+  document.getElementById("edit-lot-modal")?.remove();
+  const wrap = document.createElement("div");
+  wrap.id = "edit-lot-modal";
+  wrap.className = "modal-overlay";
+  wrap.innerHTML = `
+    <div class="modal">
+      <h3>${t("profile.editTitle")}</h3>
+      <input class="sup-input" type="text" id="edit-lot-game" maxlength="60" value="${escHtml(lot.game)}" />
+      <input class="sup-input" type="text" id="edit-lot-title" maxlength="120" value="${escHtml(lot.title)}" />
+      <input class="sup-input" type="number" id="edit-lot-price" min="0" step="1" value="${escHtml(String(lot.price))}" />
+      <textarea class="sup-textarea" id="edit-lot-desc" rows="2" maxlength="1000">${escHtml(lot.desc || "")}</textarea>
+      <div class="modal-error" id="edit-lot-err" hidden></div>
+      <button class="btn btn-primary btn-sm" id="edit-lot-save">${t("nick.save")}</button>
+      <button class="btn btn-outline btn-sm" id="edit-lot-cancel">${t("auth.cancel")}</button>
+    </div>`;
+  document.body.appendChild(wrap);
+  const close = () => wrap.remove();
+  const errEl = wrap.querySelector("#edit-lot-err");
+  const showErr = (msg) => { errEl.textContent = msg; errEl.hidden = false; };
+
+  wrap.querySelector("#edit-lot-save").addEventListener("click", async () => {
+    const game = wrap.querySelector("#edit-lot-game").value.trim();
+    const title = wrap.querySelector("#edit-lot-title").value.trim();
+    const priceRaw = wrap.querySelector("#edit-lot-price").value.trim();
+    const desc = wrap.querySelector("#edit-lot-desc").value.trim();
+    if (!game || !title || !priceRaw || Number.isNaN(Number(priceRaw)) || Number(priceRaw) <= 0) {
+      showErr(t("profile.errEmpty"));
+      return;
+    }
+    errEl.hidden = true;
+    const data = await lotsApi("edit", { id, game, title, price: priceRaw, desc });
+    if (data.ok && data.lot) {
+      const idx = myLots.findIndex((l) => l.id === data.lot.id);
+      if (idx >= 0) myLots[idx] = data.lot;
+      renderMyLots();
+      close();
+    } else if (data.error === "unauth") {
+      alert(t("auth.expired"));
+      location.href = "index.html";
+    } else if (data.error === "empty") {
+      showErr(t("profile.errEmpty"));
+    } else {
+      showErr(t("auth.errNet"));
+    }
+  });
+  wrap.querySelector("#edit-lot-cancel").addEventListener("click", close);
+  wrap.addEventListener("click", (e) => { if (e.target === wrap) close(); });
+}
+
+async function deleteLot(id) {
+  if (!confirm(t("profile.confirmDelete"))) return;
+  const data = await lotsApi("delete", { id });
+  if (data.ok) {
+    myLots = myLots.filter((l) => l.id !== id);
+    renderMyLots();
+  } else if (data.error === "unauth") {
+    alert(t("auth.expired"));
+    location.href = "index.html";
+  } else {
+    alert(t("auth.errNet"));
+  }
 }
 
 async function toggleLot(id) {

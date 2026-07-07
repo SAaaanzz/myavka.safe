@@ -17,6 +17,40 @@ const cache = {}; // roomId -> msgs
 
 let me = null; // ник авторизованного пользователя (задаётся после входа)
 
+// Реальные сделки текущего пользователя (POST /api/deals/mine), подмешиваются в DIALOGS.
+// Диалог реальной сделки: { id: deal.room, name: counterparty, dealId, status, title, price }
+async function loadDeals() {
+  try {
+    const res = await fetch("/api/deals/mine", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + (getUser()?.token || ""),
+      },
+      body: JSON.stringify({}),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.ok || !Array.isArray(data.deals)) return;
+    for (const deal of data.deals) {
+      const entry = {
+        id: deal.room,
+        name: deal.counterparty,
+        av: "av-2",
+        online: false,
+        paid: null,
+        dealId: deal.id,
+        status: deal.status,
+        title: deal.title,
+        price: deal.price,
+      };
+      const idx = DIALOGS.findIndex((x) => x.dealId === deal.id);
+      if (idx >= 0) DIALOGS[idx] = entry;
+      else DIALOGS.unshift(entry);
+    }
+  } catch { /* сеть недоступна — покажем то, что уже загружено */ }
+}
+
 // escHtml — общая функция из app.js (подключается раньше на всех страницах)
 
 function renderMedia(m) {
@@ -59,8 +93,13 @@ function renderChat() {
 
   const banner = document.getElementById("paid-banner");
   if (d.paid) {
+    // Демо-диалог с фейковой оплатой — без кнопки завершения сделки (нет dealId для API).
     banner.hidden = false;
-    banner.innerHTML = `✅ ${t("chats.paidBanner")} ${escHtml(d.paid.order)} — ${escHtml(d.paid.title)} · <strong>${escHtml(d.paid.amount)}</strong> ${t("chats.inEscrow")}
+    banner.innerHTML = `✅ ${t("chats.paidBanner")} ${escHtml(d.paid.order)} — ${escHtml(d.paid.title)} · <strong>${escHtml(d.paid.amount)}</strong> ${t("chats.inEscrow")}`;
+  } else if (d.dealId && d.status === "active") {
+    // Реальная активная сделка — показываем кнопку завершения (POST /api/deals/complete).
+    banner.hidden = false;
+    banner.innerHTML = `${escHtml(d.title || "")}${d.price ? ` · <strong>${escHtml(String(d.price))} ₸</strong>` : ""}
       <button class="btn btn-green btn-sm" id="deal-finish" style="margin-left:10px">${t("chats.finishDeal")}</button>`;
     document.getElementById("deal-finish").addEventListener("click", () => finishDeal(d));
   } else {
@@ -96,8 +135,15 @@ function renderChat() {
 async function poll() {
   const room = activeId;
   try {
-    const res = await fetch(API + room);
-    if (!res.ok) return;
+    const res = await fetch(API + room, {
+      headers: { Authorization: "Bearer " + (getUser()?.token || "") },
+    });
+    if (res.status === 401) {
+      localStorage.removeItem("user");
+      requireAuth((user) => { me = user.name; poll(); }, () => { location.href = "index.html"; });
+      return;
+    }
+    if (!res.ok) return; // 403/404 — не участник комнаты сделки, тихо пропускаем
     const { msgs } = await res.json();
     const changed = !cache[room] || cache[room].length !== msgs.length;
     cache[room] = msgs;
@@ -133,8 +179,11 @@ async function post(payload) {
   }
 }
 
-// Завершение сделки: ID проданного аккаунта проверяется по бан-базе на сервере
+// Завершение сделки: ID проданного аккаунта проверяется по бан-базе на сервере.
+// Доступно только для реальных сделок (у диалога есть dealId) — для демо-диалогов
+// кнопка вовсе не рендерится (см. renderChat).
 function finishDeal(d) {
+  if (!d.dealId) return;
   showPromptModal(t("chats.accIdPrompt"), t("chats.finishDeal"), async (accountId) => {
     try {
       const res = await fetch("/api/deals/complete", {
@@ -143,11 +192,14 @@ function finishDeal(d) {
           "Content-Type": "application/json",
           Authorization: "Bearer " + (getUser()?.token || ""),
         },
-        body: JSON.stringify({ accountId, seller: d.name, title: d.paid?.title || "" }),
+        body: JSON.stringify({ dealId: d.dealId, accountId }),
       });
       const data = await res.json();
-      if (!res.ok) { showInfoModal(t("auth.errNet")); return; }
+      if (!res.ok || !data.ok) { showInfoModal(t("auth.errNet")); return; }
       showInfoModal(data.flagged ? t("chats.dealFlagged") : t("chats.dealDone"));
+      await loadDeals();
+      renderChat();
+      renderDialogList();
     } catch {
       showInfoModal(t("auth.errNet"));
     }
@@ -214,11 +266,21 @@ document.getElementById("toast-go").addEventListener("click", () => {
 document.getElementById("toast-close").addEventListener("click", () => {
   document.getElementById("pay-toast").hidden = true;
 });
-function init() {
+async function init() {
+  await loadDeals();
+
+  // Если пришли из каталога по ссылке ?deal=<id> — открываем соответствующий диалог.
+  const dealParam = new URLSearchParams(location.search).get("deal");
+  if (dealParam) {
+    const found = DIALOGS.find((x) => x.dealId === dealParam);
+    if (found) activeId = found.id;
+  }
+
   renderDialogList();
   renderChat();
   poll();
   setInterval(poll, 2500);
+  setInterval(async () => { await loadDeals(); renderChat(); renderDialogList(); }, 15000);
   setTimeout(() => { document.getElementById("pay-toast").hidden = false; }, 1200);
 }
 
