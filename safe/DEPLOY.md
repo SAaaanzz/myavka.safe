@@ -34,7 +34,27 @@
    `https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://<ваш-домен>.pages.dev/api/telegram/webhook&secret_token=<TELEGRAM_WEBHOOK_SECRET>`
 4. Проверьте: напишите боту `/start` — он ответит ссылкой на сайт.
 
-## 3. Локальный просмотр
+## 3. Панель поддержки — бутстрап первого владельца
+
+Обычные аккаунты сотрудников (`role: "staff"`) создаёт владелец из панели
+(`action: create-staff`). Но самого первого владельца (`role: "owner"`) нужно
+создать одноразово через секретный бутстрап:
+
+1. Задайте секрет (только через переменную окружения, не хардкодить):
+   `npx wrangler pages secret put STAFF_BOOTSTRAP_SECRET --project-name=myavka-safe`
+2. Пока в KV нет ни одного `staff:*`, вызовите один раз:
+   ```bash
+   curl -X POST https://<ваш-домен>.pages.dev/api/support/bootstrap-owner \
+     -H "Content-Type: application/json" \
+     -d '{"login":"owner_login","password":"надёжный-пароль-8+", "secret":"<значение STAFF_BOOTSTRAP_SECRET>"}'
+   ```
+   Создаст сотрудника с `dept: "all"`, `role: "owner"`.
+3. После этого действие всегда отвечает `{ "error": "already_bootstrapped" }` (403),
+   даже с правильным секретом — повторный вызов не даст создать второго владельца.
+   Дальнейших сотрудников создавайте через `create-staff` от имени владельца.
+4. После успешного бутстрапа рекомендуется убрать/сменить `STAFF_BOOTSTRAP_SECRET`.
+
+## 4. Локальный просмотр
 
 ```bash
 npx wrangler pages dev site

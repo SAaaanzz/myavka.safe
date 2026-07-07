@@ -13,3 +13,6 @@ script_name = "myavka-chat-do"
 
 # Секреты (задаются через `wrangler pages secret put` или в дашборде Cloudflare):
 # TELEGRAM_BOT_TOKEN — токен бота от @BotFather
+# STAFF_BOOTSTRAP_SECRET — одноразовый секрет для создания первого owner поддержки
+#   (см. safe/DEPLOY.md, action /api/support/bootstrap-owner). После бутстрапа
+#   можно убрать/сменить.
