@@ -14,6 +14,19 @@ async function reply(env, chatId, text, replyMarkup) {
 
 const toHex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 
+// Сравнение строк за постоянное время (без ранних выходов по несовпадению байт) —
+// защита секрета вебхука от timing-атак.
+function timingSafeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  const enc = new TextEncoder();
+  const aBuf = enc.encode(a);
+  const bBuf = enc.encode(b);
+  if (aBuf.length !== bBuf.length) return false;
+  let diff = 0;
+  for (let i = 0; i < aBuf.length; i++) diff |= aBuf[i] ^ bBuf[i];
+  return diff === 0;
+}
+
 const HELP =
   "Команды:\n/start, /login — кнопка для входа на сайт\n/balance — ваш баланс на сайте\n/help — эта справка\n\nДля администраторов:\n" +
   "/credit <ник> <сумма> — изменить баланс пользователя\n" +
@@ -25,9 +38,20 @@ const HELP =
   "/deladmin <telegram_id> — снять администратора\n/admins — список администраторов";
 
 export async function onRequestPost({ request, env }) {
+  if (!env.TELEGRAM_BOT_TOKEN) return Response.json({ ok: true });
+
+  // Проверка подлинности источника: Telegram присылает секрет, заданный при setWebhook
+  // (параметр secret_token), в заголовке X-Telegram-Bot-Api-Secret-Token. Без совпадения
+  // секрета апдейт не обрабатываем — иначе можно подделать message.from.id/chat.id и
+  // получить права владельца/администратора обычным POST-запросом.
+  const providedSecret = request.headers.get("X-Telegram-Bot-Api-Secret-Token") || "";
+  if (!env.TELEGRAM_WEBHOOK_SECRET || !timingSafeEqual(providedSecret, env.TELEGRAM_WEBHOOK_SECRET)) {
+    return Response.json({ ok: true });
+  }
+
   const update = await request.json().catch(() => null);
   const message = update?.message;
-  if (!message?.text || !env.TELEGRAM_BOT_TOKEN) return Response.json({ ok: true });
+  if (!message?.text) return Response.json({ ok: true });
 
   const chatId = String(message.chat.id);
   const [cmdRaw, ...args] = message.text.trim().split(/\s+/);

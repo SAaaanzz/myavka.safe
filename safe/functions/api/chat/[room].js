@@ -1,6 +1,25 @@
 const MAX_BODY = 8 * 1024 * 1024; // 8 МБ на сообщение с медиа
 const MEDIA_TTL = 60 * 60 * 24 * 30; // медиа храним 30 дней
 
+// Белый список безопасных MIME-типов вложений. Никаких text/html, image/svg+xml,
+// application/xhtml+xml и прочих потенциально исполняемых типов — иначе через
+// /api/media/:id можно отдать активный контент с своего origin (XSS).
+const SAFE_MEDIA_TYPES = new Set([
+  "image/png",
+  "image/jpeg",
+  "image/gif",
+  "image/webp",
+  "image/avif",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+  "audio/mpeg",
+  "audio/ogg",
+  "audio/wav",
+  "audio/webm",
+  "application/pdf",
+]);
+
 const room = (env, name) => env.CHAT_DO.get(env.CHAT_DO.idFromName(name));
 
 async function sessionNick(env, request) {
@@ -47,7 +66,11 @@ export async function onRequestPost({ env, params, request }) {
     if (!/^data:[\w.+-]+\/[\w.+-]+;base64,/.test(data)) {
       return Response.json({ error: "bad_media" }, { status: 400 });
     }
-    const type = String(rawMedia.type || "application/octet-stream").slice(0, 60);
+    // Тип берём из тела клиента, но доверять ему нельзя — приводим к безопасному
+    // белому списку. Всё, чего нет в списке (в т.ч. text/html, image/svg+xml),
+    // становится application/octet-stream — отдаваться будет только на скачивание.
+    const declaredType = String(rawMedia.type || "").toLowerCase().split(";")[0].trim();
+    const type = SAFE_MEDIA_TYPES.has(declaredType) ? declaredType : "application/octet-stream";
     const name = String(rawMedia.name || "file").slice(0, 120);
     await env.CHAT.put(`media:${id}`, JSON.stringify({ type, name, data }), { expirationTtl: MEDIA_TTL });
     media = { type, name, url: `/api/media/${id}`, data };

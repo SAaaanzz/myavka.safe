@@ -4,6 +4,9 @@
 const STAFF_SESSION_TTL = 60 * 60 * 12; // смена сотрудника — 12 часов
 const DEPTS = ["verification", "sales", "ban", "other"];
 
+const LOGIN_RL_WINDOW = 60; // секунд
+const LOGIN_RL_LIMIT = 10; // попыток входа сотрудника с одного IP за окно
+
 const toHex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 
 async function hashPassword(password, saltHex) {
@@ -29,6 +32,29 @@ async function getStaff(env, request) {
   return staff ? { login, ...staff } : null;
 }
 
+// Простой счётчик попыток входа по IP в KV с фиксированным окном.
+// Возвращает true, если лимит уже превышен (запрос нужно отклонить).
+async function loginRateLimited(env, request) {
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  const key = `rl:slogin:${ip}`;
+  const count = Number((await env.CHAT.get(key)) || 0);
+  if (count >= LOGIN_RL_LIMIT) return true;
+  await env.CHAT.put(key, String(count + 1), { expirationTtl: LOGIN_RL_WINDOW });
+  return false;
+}
+
+// Сравнение строк за постоянное время (насколько это возможно в JS) — чтобы не
+// давать атакующему таймингом угадать секрет бутстрапа побайтово.
+function timingSafeEqualStr(a, b) {
+  const enc = new TextEncoder();
+  const ab = enc.encode(a);
+  const bb = enc.encode(b);
+  const len = Math.max(ab.length, bb.length, 1);
+  let diff = ab.length ^ bb.length;
+  for (let i = 0; i < len; i++) diff |= (ab[i] || 0) ^ (bb[i] || 0);
+  return diff === 0;
+}
+
 async function getUserNick(env, request) {
   const auth = request.headers.get("Authorization") || "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
@@ -47,6 +73,9 @@ export async function onRequestPost({ env, params, request }) {
 
   // ---- Вход сотрудника ----
   if (action === "login") {
+    if (await loginRateLimited(env, request)) {
+      return Response.json({ error: "rate_limited" }, { status: 429 });
+    }
     const login = String(body.login || "").toLowerCase();
     const password = String(body.password || "");
     if (!/^[a-z0-9_]{3,32}$/.test(login) || !password) return Response.json({ error: "bad_credentials" }, { status: 400 });
@@ -73,6 +102,32 @@ export async function onRequestPost({ env, params, request }) {
       JSON.stringify({ id, dept, from: "@" + nick, subject, text, status: "open", replies: [], created: Date.now() })
     );
     return Response.json({ ok: true, id });
+  }
+
+  // ---- Одноразовый бутстрап первого владельца поддержки ----
+  // Работает, только пока в KV нет ни одного staff:* и задан env.STAFF_BOOTSTRAP_SECRET.
+  // После создания первого сотрудника (в т.ч. любым другим путём) — навсегда 403.
+  if (action === "bootstrap-owner") {
+    if (!env.STAFF_BOOTSTRAP_SECRET) {
+      return Response.json({ error: "forbidden" }, { status: 403 });
+    }
+    const existing = await env.CHAT.list({ prefix: "staff:", limit: 1 });
+    if (existing.keys.length > 0) {
+      return Response.json({ error: "already_bootstrapped" }, { status: 403 });
+    }
+    const secret = String(body.secret || "");
+    if (!secret || !timingSafeEqualStr(secret, env.STAFF_BOOTSTRAP_SECRET)) {
+      return Response.json({ error: "forbidden" }, { status: 403 });
+    }
+    const login = String(body.login || "").toLowerCase();
+    const password = String(body.password || "");
+    if (!/^[a-z0-9_]{3,32}$/.test(login)) return Response.json({ error: "bad_login" }, { status: 400 });
+    if (password.length < 8) return Response.json({ error: "weak_password" }, { status: 400 });
+    // Повторно проверяем отсутствие занятого логина (на случай гонки с обычным create-staff)
+    if (await env.CHAT.get(`staff:${login}`)) return Response.json({ error: "taken" }, { status: 409 });
+    const { salt, hash } = await hashPassword(password);
+    await env.CHAT.put(`staff:${login}`, JSON.stringify({ salt, hash, dept: "all", role: "owner" }));
+    return Response.json({ ok: true });
   }
 
   // ---- Дальше только для сотрудников ----

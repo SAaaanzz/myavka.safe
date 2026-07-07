@@ -22,10 +22,16 @@
 ## 2. Telegram-бот
 
 1. Создайте бота через [@BotFather](https://t.me/BotFather) → получите токен.
-2. Добавьте секрет в Cloudflare:
-   `npx wrangler pages secret put TELEGRAM_BOT_TOKEN --project-name=myavka-safe`
-3. Зарегистрируйте webhook:
-   `https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://<ваш-домен>.pages.dev/api/telegram/webhook`
+2. Добавьте секреты в Cloudflare:
+   - `npx wrangler pages secret put TELEGRAM_BOT_TOKEN --project-name=myavka-safe`
+   - `npx wrangler pages secret put TELEGRAM_WEBHOOK_SECRET --project-name=myavka-safe`
+     (случайная строка, например `openssl rand -hex 32`; без неё вебхук будет молча
+     игнорировать все входящие апдейты — команды бота работать не будут)
+3. Зарегистрируйте webhook, передав тот же секрет в параметре `secret_token`
+   (Telegram будет присылать его в заголовке `X-Telegram-Bot-Api-Secret-Token`,
+   бэкенд сверяет его и отбрасывает апдейты без совпадения — так исключаются
+   поддельные POST-запросы на `/api/telegram/webhook`):
+   `https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://<ваш-домен>.pages.dev/api/telegram/webhook&secret_token=<TELEGRAM_WEBHOOK_SECRET>`
 4. Проверьте: напишите боту `/start` — он ответит ссылкой на сайт.
 
 ## 3. Локальный просмотр
