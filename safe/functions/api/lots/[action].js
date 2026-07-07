@@ -39,8 +39,50 @@ async function getLotsByIds(env, ids) {
   return lots.filter(Boolean);
 }
 
+const DEFAULT_ALL_LIMIT = 200;
+const MAX_ALL_LIMIT = 500;
+
 export async function onRequestGet({ env, params, request }) {
   const action = params.action;
+
+  // ---- Публичный каталог всех активных лотов ----
+  if (action === "all") {
+    const url = new URL(request.url);
+    const gameFilter = String(url.searchParams.get("game") || "").trim();
+    let limit = parseInt(url.searchParams.get("limit") || "", 10);
+    if (!Number.isFinite(limit) || limit <= 0) limit = DEFAULT_ALL_LIMIT;
+    limit = Math.min(limit, MAX_ALL_LIMIT);
+
+    const lots = [];
+    let cursor;
+    do {
+      const page = await env.CHAT.list({ prefix: "lot:", cursor, limit: 1000 });
+      const values = await Promise.all(
+        page.keys.map(async (k) => {
+          const raw = await env.CHAT.get(k.name);
+          if (!raw) return null;
+          try {
+            return JSON.parse(raw);
+          } catch {
+            return null;
+          }
+        })
+      );
+      for (const lot of values) {
+        if (!lot || lot.active !== true) continue;
+        if (gameFilter && String(lot.game || "").toLowerCase() !== gameFilter.toLowerCase()) continue;
+        lots.push(lot);
+      }
+      cursor = page.list_complete ? undefined : page.cursor;
+    } while (cursor);
+
+    lots.sort((a, b) => (b.created || 0) - (a.created || 0));
+    const limited = lots
+      .slice(0, limit)
+      .map((l) => ({ id: l.id, owner: l.owner, game: l.game, title: l.title, price: l.price, desc: l.desc }));
+
+    return Response.json({ ok: true, lots: limited });
+  }
 
   // ---- Публичный список активных лотов владельца (для чужого профиля) ----
   if (action === "by-owner") {
@@ -114,6 +156,58 @@ export async function onRequestPost({ env, params, request }) {
     lot.active = !lot.active;
     await env.CHAT.put(`lot:${id}`, JSON.stringify(lot));
     return Response.json({ ok: true, lot });
+  }
+
+  // ---- Редактировать лот (только владелец) ----
+  if (action === "edit") {
+    const id = String(body.id || "");
+    if (!id) return Response.json({ error: "bad_request" }, { status: 400 });
+    const raw = await env.CHAT.get(`lot:${id}`);
+    if (!raw) return Response.json({ error: "not_found" }, { status: 404 });
+    const lot = JSON.parse(raw);
+    if (lot.owner !== nick) return Response.json({ ok: false, error: "forbidden" }, { status: 403 });
+
+    if (Object.prototype.hasOwnProperty.call(body, "game")) {
+      const game = String(body.game || "").trim().slice(0, MAX_GAME);
+      if (!game) return Response.json({ error: "empty" }, { status: 400 });
+      lot.game = game;
+    }
+    if (Object.prototype.hasOwnProperty.call(body, "title")) {
+      const title = String(body.title || "").trim().slice(0, MAX_TITLE);
+      if (!title) return Response.json({ error: "empty" }, { status: 400 });
+      lot.title = title;
+    }
+    if (Object.prototype.hasOwnProperty.call(body, "price")) {
+      const price = String(body.price || "").trim().slice(0, MAX_PRICE);
+      if (!price) return Response.json({ error: "empty" }, { status: 400 });
+      lot.price = price;
+    }
+    if (Object.prototype.hasOwnProperty.call(body, "desc")) {
+      lot.desc = String(body.desc || "").trim().slice(0, MAX_DESC);
+    }
+
+    await env.CHAT.put(`lot:${id}`, JSON.stringify(lot));
+    return Response.json({ ok: true, lot });
+  }
+
+  // ---- Удалить лот (только владелец) ----
+  if (action === "delete") {
+    const id = String(body.id || "");
+    if (!id) return Response.json({ error: "bad_request" }, { status: 400 });
+    const raw = await env.CHAT.get(`lot:${id}`);
+    if (raw) {
+      const lot = JSON.parse(raw);
+      if (lot.owner !== nick) return Response.json({ ok: false, error: "forbidden" }, { status: 403 });
+      await env.CHAT.delete(`lot:${id}`);
+    }
+
+    const ids = await getOwnerLotIds(env, nick);
+    const filtered = ids.filter((x) => x !== id);
+    if (filtered.length !== ids.length) {
+      await env.CHAT.put(`ulots:${nick}`, JSON.stringify(filtered));
+    }
+
+    return Response.json({ ok: true });
   }
 
   // ---- Видимость списка лотов в профиле ----

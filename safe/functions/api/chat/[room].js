@@ -29,7 +29,33 @@ async function sessionNick(env, request) {
   return env.CHAT.get(`session:${token}`);
 }
 
+// Комнаты сделок (deal_<id>) приватны: доступ только покупателю и продавцу
+// этой конкретной сделки. Остальные комнаты (general, легаси-демо) — общее
+// лобби, доступное любому авторизованному пользователю.
+async function checkRoomAccess(env, roomName, nick) {
+  if (!roomName.startsWith("deal_")) return { ok: true };
+  const dealId = roomName.slice(5);
+  const raw = await env.CHAT.get(`deal:${dealId}`);
+  if (!raw) return { ok: false, status: 404, error: "not_found" };
+  let deal;
+  try {
+    deal = JSON.parse(raw);
+  } catch {
+    return { ok: false, status: 404, error: "not_found" };
+  }
+  if (deal.buyer !== nick && deal.seller !== nick) {
+    return { ok: false, status: 403, error: "forbidden" };
+  }
+  return { ok: true };
+}
+
 export async function onRequestGet({ env, params, request }) {
+  const nick = await sessionNick(env, request);
+  if (!nick) return Response.json({ error: "unauthorized" }, { status: 401 });
+
+  const access = await checkRoomAccess(env, params.room, nick);
+  if (!access.ok) return Response.json({ error: access.error }, { status: access.status });
+
   const url = new URL(request.url);
   const since = Number(url.searchParams.get("since") || 0);
   const msgs = await room(env, params.room).getMessages(since);
@@ -51,6 +77,8 @@ export async function onRequestPost({ env, params, request }) {
   if (await env.CHAT.get(`ban:${nick}`)) {
     return Response.json({ error: "banned" }, { status: 403 });
   }
+  const access = await checkRoomAccess(env, params.room, nick);
+  if (!access.ok) return Response.json({ error: access.error }, { status: access.status });
   const from = "@" + nick;
   // Флаг верификации берётся только с сервера — клиент не может его подделать
   const acc = JSON.parse((await env.CHAT.get(`unick:${nick}`)) || "{}");
