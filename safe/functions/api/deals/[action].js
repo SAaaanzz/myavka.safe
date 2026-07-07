@@ -85,6 +85,10 @@ export async function onRequestPost({ env, params, request }) {
       return Response.json({ error: "lot_not_found" }, { status: 404 });
     }
 
+    if (lot.active !== true) {
+      return Response.json({ error: "lot_inactive" }, { status: 409 });
+    }
+
     const buyer = nick;
     const seller = lot.owner;
     if (seller === buyer) {
@@ -154,22 +158,22 @@ export async function onRequestPost({ env, params, request }) {
       return Response.json({ ok: true, flagged: false });
     }
 
-    // Аккаунт в бан-базе: блокируем продавца до решения администратора
+    // Аккаунт в бан-базе: сделку помечаем как подозрительную и уведомляем
+    // администраторов. Бан продавца — только вручную (/ban, /unban), автобан
+    // здесь недопустим: create не проверяет оплату, поэтому accountId из
+    // публичного /api/blacklist можно подставить в чужую сделку без участия
+    // реального продавца проблемного аккаунта.
     const { reason } = JSON.parse(banned);
-    await env.CHAT.put(
-      `ban:${seller}`,
-      JSON.stringify({ by: "system", accountId, reason, ts: Date.now() })
-    );
     deal.status = "flagged";
     await env.CHAT.put(`deal:${deal.id}`, JSON.stringify(deal));
     await notifyAdmins(
       env,
       `🚨 ВНИМАНИЕ: завершена сделка с аккаунтом из бан-базы!\n\n` +
         `ID аккаунта: ${accountId}\nПричина в базе: ${reason}\n` +
-        `Продавец: @${seller} — ЗАБЛОКИРОВАН до вашего решения (/unban ${seller})\n` +
+        `Продавец: @${seller} — требуется ручная проверка (/ban ${seller} при подтверждении)\n` +
         `Покупатель: @${nick}\nЛот: ${title || "—"}`
     );
-    return Response.json({ ok: true, flagged: true, sellerBanned: true });
+    return Response.json({ ok: true, flagged: true });
   }
 
   // ---- Отменить активную сделку (участник: покупатель или продавец) ----
