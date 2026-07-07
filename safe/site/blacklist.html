@@ -46,19 +46,16 @@
 
   <section class="section">
     <div class="container">
-      <div class="bl-search search"><input type="text" data-i18n-ph="bl.searchPh" placeholder="@username, Telegram ID, +7 700 …, или номер Kaspi" /><button class="btn btn-primary btn-sm" data-i18n="bl.check">Проверить</button></div>
+      <div class="bl-search search"><input type="text" id="bl-search-input" data-i18n-ph="bl.searchPh" placeholder="@username, Telegram ID, +7 700 …, или номер Kaspi" /><button class="btn btn-primary btn-sm" id="bl-check-btn" data-i18n="bl.check">Проверить</button></div>
+
+      <div id="bl-result" hidden style="margin-bottom:22px"></div>
 
       <h2 style="font-size:1.3rem;text-align:left;margin-bottom:18px" data-i18n="bl.recent">Последние записи</h2>
       <table class="bl-table">
         <thead>
-          <tr><th data-i18n="bl.date">Дата</th><th data-i18n="bl.id">Идентификатор</th><th>Telegram ID</th><th data-i18n="bl.reason">Причина</th><th data-i18n="bl.status">Статус</th></tr>
+          <tr><th data-i18n="bl.date">Дата</th><th data-i18n="bl.id">Идентификатор</th><th data-i18n="bl.reason">Причина</th><th data-i18n="bl.status">Статус</th></tr>
         </thead>
-        <tbody>
-          <tr><td>02.07.2026</td><td>@fake_seller_777</td><td>7482913056</td><td>Не выполнил услугу после получения предоплаты вне сервиса</td><td><span class="badge-danger">Мошенник</span></td></tr>
-          <tr><td>30.06.2026</td><td>+7 707 *** ** 12</td><td>6091254783</td><td>Восстановил проданный аккаунт через поддержку игры</td><td><span class="badge-danger">Мошенник</span></td></tr>
-          <tr><td>28.06.2026</td><td>@ml_boost_cheap</td><td>5738204916</td><td>Подделка скриншотов выполнения буста</td><td><span class="badge-danger">Мошенник</span></td></tr>
-          <tr><td>25.06.2026</td><td>@tg_premium_low</td><td>7015648392</td><td>Оплата Premium с краденых карт — подписка отозвана</td><td><span class="badge-danger">Мошенник</span></td></tr>
-          <tr><td>21.06.2026</td><td>+7 701 *** ** 45</td><td>6845127930</td><td>Множественные аккаунты для накрутки рейтинга</td><td><span class="badge-danger">Мошенник</span></td></tr>
+        <tbody id="bl-recent-body">
         </tbody>
       </table>
     </div>
@@ -70,5 +67,6 @@
     </div>
   </footer>
   <script src="js/app.js"></script>
+  <script src="js/blacklist.js"></script>
 </body>
 </html>

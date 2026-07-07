@@ -199,6 +199,8 @@ function bindVisibilityToggle(listingsPublic) {
 function bindLogout() {
   document.getElementById("p-logout").addEventListener("click", () => {
     if (confirm(t("auth.logout"))) {
+      const token = getUser()?.token || "";
+      fetch("/api/auth/logout", { method: "POST", headers: { Authorization: "Bearer " + token } }).catch(() => {});
       localStorage.removeItem("user");
       location.href = "index.html";
     }
